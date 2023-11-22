@@ -1,0 +1,12 @@
+--QUAN_LY_THU_PHIEntities--
+
+Scaffold-DbContext "ConnectionStrings:QUAN_LY_THU_PHIEntities" Microsoft.EntityFrameworkCore.SqlServer -Namespace BaseNetCoreApi.Models.QUAN_LY_THU_PHIEntities -ContextNamespace BaseNetCoreApi.Infrastructure.Models.QUAN_LY_THU_PHIEntities -OutputDir Infrastructure/Models/QUAN_LY_THU_PHIEntities -Context QUAN_LY_THU_PHIEntities -Force
+
+--
+
+
+--BO_GIAO_DUCEntities--
+
+Scaffold-DbContext "ConnectionStrings:BO_GIAO_DUCEntities" Microsoft.EntityFrameworkCore.SqlServer -Namespace BaseNetCoreApi.Models.BO_GIAO_DUCEntities -ContextNamespace BaseNetCoreApi.Infrastructure.Models.BO_GIAO_DUCEntities -OutputDir Infrastructure/Models/BO_GIAO_DUCEntities -Context BO_GIAO_DUCEntities -Force
+
+--
