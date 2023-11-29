@@ -15,7 +15,12 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
         void Invalidate(string key);
         void RemoveAll();
         void RemoveByFirstName(string key);
-        string BuildCachedKey(params object[] objects);
+        string BuildCachedKey(params object[] objects); public T GetByKey<T>(Func<T> getDataSource,
+           string key,
+           double cacheTime = CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES,
+           bool isDeepClone = true)
+           where T : new();
+        void Remove(string cacheKey);
     }
     public class QiCache : IQiCache
     {
@@ -73,6 +78,15 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
             }
             catch { }
         }
+        public void Remove(string cacheKey)
+        {
+            try
+            {
+                Cache.Remove(cacheKey);
+            }
+            catch { }
+        }
+
         public void RemoveByFirstName(string name)
         {
             try

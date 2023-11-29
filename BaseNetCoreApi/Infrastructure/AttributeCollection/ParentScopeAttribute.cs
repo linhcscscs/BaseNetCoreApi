@@ -1,4 +1,4 @@
-﻿using static BaseNetCoreApi.Values.PermissionByClaim;
+﻿using static BaseNetCoreApi.Values.ScopePermission;
 
 namespace BaseNetCoreApi.Infrastructure.AttributeCollection
 {

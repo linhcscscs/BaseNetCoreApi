@@ -57,5 +57,7 @@ public partial class LichSuThuTienCt
 
     public DateTime? NgaySua { get; set; }
 
+    public long? IdPhieuThuCt { get; set; }
+
     public virtual LichSuThuTien IdLsttNavigation { get; set; } = null!;
 }

@@ -31,8 +31,6 @@ public partial class DmCapHoc
 
     public virtual ICollection<DiemDanhKhoanThu> DiemDanhKhoanThus { get; set; } = new List<DiemDanhKhoanThu>();
 
-    public virtual ICollection<DkKhoanThuSlDg> DkKhoanThuSlDgs { get; set; } = new List<DkKhoanThuSlDg>();
-
     public virtual ICollection<DkKhoanThuTn> DkKhoanThuTns { get; set; } = new List<DkKhoanThuTn>();
 
     public virtual ICollection<DmKhoi> DmKhois { get; set; } = new List<DmKhoi>();

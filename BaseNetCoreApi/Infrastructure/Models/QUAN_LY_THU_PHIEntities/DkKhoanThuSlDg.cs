@@ -50,16 +50,4 @@ public partial class DkKhoanThuSlDg
     public string? NguoiSua { get; set; }
 
     public DateTime? NgaySua { get; set; }
-
-    public virtual HocSinh IdHocSinhNavigation { get; set; } = null!;
-
-    public virtual KhoanThu? IdKhoanThuNavigation { get; set; }
-
-    public virtual Lop IdLopNavigation { get; set; } = null!;
-
-    public virtual Truong IdTruongNavigation { get; set; } = null!;
-
-    public virtual DmCapHoc MaCapHocNavigation { get; set; } = null!;
-
-    public virtual NamHoc MaNamHocNavigation { get; set; } = null!;
 }

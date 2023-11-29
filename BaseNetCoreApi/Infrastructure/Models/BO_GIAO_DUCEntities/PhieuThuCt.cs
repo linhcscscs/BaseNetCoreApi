@@ -85,6 +85,8 @@ public partial class PhieuThuCt
 
     public DateTime? NgaySua { get; set; }
 
+    public long? IdLichSuThanhToan { get; set; }
+
     public virtual DmMienGiam? IdDmMienGiamNavigation { get; set; }
 
     public virtual HocSinh IdHocSinhNavigation { get; set; } = null!;

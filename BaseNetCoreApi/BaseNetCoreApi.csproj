@@ -10,6 +10,7 @@
     <PackageReference Include="DeepCloner" Version="0.10.4" />
     <PackageReference Include="EFCore.BulkExtensions" Version="7.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.14" />
@@ -25,7 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Middleware\" />
+    <Folder Include="FileFolder\Internal\Temp\" />
+    <Folder Include="FileFolder\Static\Template\" />
     <Folder Include="Models\Dtos\" />
   </ItemGroup>
 

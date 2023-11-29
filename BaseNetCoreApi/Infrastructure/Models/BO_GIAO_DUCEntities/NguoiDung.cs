@@ -62,4 +62,8 @@ public partial class NguoiDung
     public string? MaKhoiPhucMatKhau { get; set; }
 
     public decimal IdSource { get; set; }
+
+    public virtual ICollection<NhomQuyenNguoiDung> NhomQuyenNguoiDungs { get; set; } = new List<NhomQuyenNguoiDung>();
+
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }
