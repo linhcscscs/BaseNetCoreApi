@@ -22,10 +22,10 @@ namespace BaseNetCoreApi.Services
     public class PermissionService : IPermissionService
     {
         #region Contructor
-        private IContextProvider<BO_GIAO_DUCEntities> _contextProvider;
+        private IBoGiaoDucContextProvider _contextProvider;
         private IWorkContextService _workContextService;
         private IQiCache _qiCache;
-        public PermissionService(IContextProvider<BO_GIAO_DUCEntities> contextProvider, IWorkContextService workContextService, IQiCache qiCache)
+        public PermissionService(IBoGiaoDucContextProvider contextProvider, IWorkContextService workContextService, IQiCache qiCache)
         {
             _contextProvider = contextProvider;
             _workContextService = workContextService;

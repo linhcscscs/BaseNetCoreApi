@@ -1,4 +1,5 @@
-﻿using BaseNetCoreApi.Models.ViewModel;
+﻿using BaseNetCoreApi.Models.Dtos;
+using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mail;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace BaseNetCoreApi.Helper
@@ -108,6 +110,17 @@ namespace BaseNetCoreApi.Helper
                 ret = new ReturnCode(EReturnCode.InternalErrorException);
             }
             return ret;
+        }
+        public static PaginationResponse<Tout> ConvertToType<Tin, Tout>(this PaginationResponse<Tin> model, Func<Tin, Tout> func)
+        {
+            return new PaginationResponse<Tout>()
+            {
+                PageIndex = model.PageIndex,
+                TotalItems = model.TotalItems,
+                PageSize = model.PageSize,
+                TotalPages = model.TotalPages,
+                Data = model.Data.Select(func).ToList(),
+            };
         }
     }
 }
