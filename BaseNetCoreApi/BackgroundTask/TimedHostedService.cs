@@ -9,7 +9,6 @@ namespace BaseNetCoreApi.BackgroundTask
         private readonly ILogger<TimedHostedService> _logger;
         private Timer? _timer = null;
         private const string CLEAR_EXPERIED_REFRESHTOKEN_CONFIG_NAME = "ClearExpRefeshToken";
-        private const string CLEAR_EXPERIED_REFRESHTOKEN_CONFIG_NAME = "ClearExpRefeshToken";
 
         private ICommonBackgroundTaskQueue _CommonBackgroundTaskQueue;
         public TimedHostedService(ILogger<TimedHostedService> logger,ICommonBackgroundTaskQueue CommonBackgroundTaskQueue)

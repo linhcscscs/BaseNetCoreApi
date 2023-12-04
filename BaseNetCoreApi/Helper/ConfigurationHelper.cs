@@ -80,7 +80,7 @@
 
         public static class TimedService
         {
-            public static string CLEAR_EXPERIED_REFRESHTOKEN_CONFIG_NAME = "ClearExpRefeshToken"
+            public static string CLEAR_EXPERIED_REFRESHTOKEN_CONFIG_NAME = "ClearExpRefeshToken";
             public static string CLEAR_TEMP_FILE_CONFIG_NAME = "ClearTempFile";
         }
     }
