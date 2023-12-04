@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BaseNetCoreApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("")]
     [ApiController]
     public class TestController : ControllerBase
     {
-        // GET: api/<ValuesController>
+        [Route("/upload")]
         [HttpPost]
         public IActionResult SaveAndReturnFile([FromForm] TestUpload testUpload)
         {

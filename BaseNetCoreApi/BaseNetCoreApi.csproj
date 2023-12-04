@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="ClosedXML" Version="0.102.1" />
     <PackageReference Include="DeepCloner" Version="0.10.4" />
     <PackageReference Include="EFCore.BulkExtensions" Version="7.1.6" />
@@ -30,7 +31,6 @@
   <ItemGroup>
     <Folder Include="FileFolder\Internal\Temp\" />
     <Folder Include="FileFolder\Static\Template\" />
-    <Folder Include="Models\Dtos\" />
   </ItemGroup>
 
 </Project>

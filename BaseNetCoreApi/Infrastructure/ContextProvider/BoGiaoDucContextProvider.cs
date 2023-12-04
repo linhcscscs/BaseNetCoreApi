@@ -9,7 +9,11 @@ using System.Configuration;
 
 namespace BaseNetCoreApi.Infrastructure.ContextProvider
 {
-    public class BoGiaoDucContextProvider : IContextProvider<BO_GIAO_DUCEntities>
+    public interface IBoGiaoDucContextProvider : IContextProvider<BO_GIAO_DUCEntities>
+    {
+
+    }
+    public class BoGiaoDucContextProvider : IBoGiaoDucContextProvider
     {
         public ReadOnlyCollection<SQLConnectEntity> getListDB()
         {

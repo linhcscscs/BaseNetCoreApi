@@ -20,12 +20,12 @@ namespace BaseNetCoreApi.Services
     }
     public class NguoiDungService : INguoiDungService
     {
-        private IContextProvider<BO_GIAO_DUCEntities> _contextProvider;
+        private IBoGiaoDucContextProvider _contextProvider;
         private IQiCache _qiCache;
         private IWorkContextService _workContextService;
         private IContextDomainService _contextDomainService;
         public NguoiDungService(
-            IContextProvider<BO_GIAO_DUCEntities> contextProvider,
+            IBoGiaoDucContextProvider contextProvider,
             IQiCache qiCache,
             IWorkContextService workContextService,
             IContextDomainService contextDomainService

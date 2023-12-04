@@ -8,10 +8,11 @@ namespace BaseNetCoreApi.BackgroundTask
     {
         private readonly ILogger<TimedHostedService> _logger;
         private Timer? _timer = null;
+        private Dictionary<string, List<TimeSpan>> TaskTimed = new Dictionary<string, List<TimeSpan>>();
         private const string CLEAR_EXPERIED_REFRESHTOKEN_CONFIG_NAME = "ClearExpRefeshToken";
 
         private ICommonBackgroundTaskQueue _CommonBackgroundTaskQueue;
-        public TimedHostedService(ILogger<TimedHostedService> logger,ICommonBackgroundTaskQueue CommonBackgroundTaskQueue)
+        public TimedHostedService(ILogger<TimedHostedService> logger, ICommonBackgroundTaskQueue CommonBackgroundTaskQueue)
         {
             _logger = logger;
             _CommonBackgroundTaskQueue = CommonBackgroundTaskQueue;
@@ -56,14 +57,19 @@ namespace BaseNetCoreApi.BackgroundTask
 
         public List<TimeSpan> GetActiveTime(string configName)
         {
-            var result = new List<TimeSpan>();
-            var lstTimed = ConfigurationHelper.Configuration.GetSection("AppSettings:TimedService:" + configName)
-                .GetChildren().Select(s => s.Value?.ToString()).ToList() ?? new List<string?>();
-            lstTimed.ForEach(timed =>
+            List<TimeSpan>? result = new List<TimeSpan>();
+            if (!TaskTimed.TryGetValue(configName, out result))
             {
-                var timeSpan = TimeSpan.ParseExact(timed ?? "", "hh':'ss", null);
-                result.Add(timeSpan);
-            });
+                result = new List<TimeSpan>();
+                var lstTimed = Configuration.GetSection(TimedService.TIMED_SERVICE_CONFIG_NAME + configName)
+                    .GetChildren().Select(s => s.Value?.ToString()).ToList() ?? new List<string?>();
+                lstTimed.ForEach(timed =>
+                {
+                    var timeSpan = TimeSpan.ParseExact(timed ?? "", "hh':'ss", null);
+                    result.Add(timeSpan);
+                });
+                TaskTimed.Add(configName,result);
+            }
             return result;
         }
         public bool IsActiveTime(TimeSpan now, string configName)

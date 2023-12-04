@@ -30,9 +30,9 @@ namespace BaseNetCoreApi.Services
         private INguoiDungService _nguoiDungService;
         private IPermissionService _permissionService;
         private IQiCache _qiCache;
-        private IContextProvider<BO_GIAO_DUCEntities> _contextProvider;
+        private IBoGiaoDucContextProvider _contextProvider;
         private IWorkContextService _workContextService;
-        public AuthenticateService(INguoiDungService nguoiDungService, IQiCache qiCache, IPermissionService permissionService, IContextProvider<BO_GIAO_DUCEntities> contextProvider, IWorkContextService workContextService)
+        public AuthenticateService(INguoiDungService nguoiDungService, IQiCache qiCache, IPermissionService permissionService, IBoGiaoDucContextProvider contextProvider, IWorkContextService workContextService)
         {
             _nguoiDungService = nguoiDungService;
             _qiCache = qiCache;

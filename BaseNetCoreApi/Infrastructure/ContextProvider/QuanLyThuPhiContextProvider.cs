@@ -8,7 +8,11 @@ using System.Collections.ObjectModel;
 
 namespace BaseNetCoreApi.Infrastructure.ContextProvider
 {
-    public class QuanLyThuPhiContextProvider : IContextProvider<QUAN_LY_THU_PHIEntities>
+    public interface IQuanLyThuPhiContextProvider : IContextProvider<QUAN_LY_THU_PHIEntities>
+    {
+
+    }
+    public class QuanLyThuPhiContextProvider : IQuanLyThuPhiContextProvider
     {
         public ReadOnlyCollection<SQLConnectEntity> getListDB()
         {

@@ -70,7 +70,7 @@
             get
             {
                 double tempFileExpInMinutes = 60;
-                if (double.TryParse(GetConfigByName("AppSettings:IsSessionAuth"), out var tempFileExpInMinutesTemp))
+                if (double.TryParse(GetConfigByName("AppSettings:TempFileExpInMinutes"), out var tempFileExpInMinutesTemp))
                 {
                     tempFileExpInMinutes = tempFileExpInMinutesTemp;
                 }
@@ -80,8 +80,22 @@
 
         public static class TimedService
         {
+            public static string TIMED_SERVICE_CONFIG_NAME = "AppSettings:TimedService:";
             public static string CLEAR_EXPERIED_REFRESHTOKEN_CONFIG_NAME = "ClearExpRefeshToken";
             public static string CLEAR_TEMP_FILE_CONFIG_NAME = "ClearTempFile";
+        }
+
+        public static int MaxPageSize
+        {
+            get
+            {
+                int maxPageSize = 200;
+                if (int.TryParse(GetConfigByName("AppSettings:MaxPageSize"), out var maxPageSizeTemp))
+                {
+                    maxPageSize = maxPageSizeTemp;
+                }
+                return maxPageSize;
+            }
         }
     }
 }

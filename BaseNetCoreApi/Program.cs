@@ -173,13 +173,14 @@ services.AddSwaggerGen(c =>
 #endregion
 #region DI
 #region Service
-services.AddTransient<IContextProvider<BO_GIAO_DUCEntities>, BoGiaoDucContextProvider>();
-services.AddTransient<IContextProvider<QUAN_LY_THU_PHIEntities>, QuanLyThuPhiContextProvider>();
+services.AddTransient<IBoGiaoDucContextProvider, BoGiaoDucContextProvider>();
+services.AddTransient<IQuanLyThuPhiContextProvider, QuanLyThuPhiContextProvider>();
 services.AddSingleton<IQiCache, QiCache>();
 services.AddTransient<INguoiDungService, NguoiDungService>();
 services.AddScoped<IWorkContextService, WorkContextService>();
 services.AddTransient<IPermissionService, PermissionService>();
 services.AddTransient<IAuthenticateService, AuthenticateService>();
+services.AddTransient<ICommonService, CommonService>();
 #endregion
 #region DomainService
 services.AddTransient<IContextDomainService, ContextDomainService>();
@@ -194,6 +195,7 @@ services.AddSingleton<ICommonBackgroundTaskQueue, CommonBackgroundTaskQueue>();
 #endregion
 #region config
 services.AddHttpContextAccessor();
+services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
 //Upload
 services.Configure<IISServerOptions>(options =>
