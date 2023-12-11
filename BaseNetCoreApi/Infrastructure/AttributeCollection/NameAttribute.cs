@@ -1,6 +1,6 @@
 ﻿namespace BaseNetCoreApi.Infrastructure.AttributeCollection
 {
-    class NameAttribute : Attribute, ICustomeAttribute<string>
+    class NameAttribute : Attribute, ICustomAttribute<string>
     {
         private string _value;
         public NameAttribute(string value) { _value = value; }

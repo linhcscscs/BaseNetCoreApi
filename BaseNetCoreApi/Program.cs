@@ -22,7 +22,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System.Reflection;
 using System.Text;
-using static BaseNetCoreApi.Values.ScopePermission;
 
 var builder = WebApplication.CreateBuilder(args);
 

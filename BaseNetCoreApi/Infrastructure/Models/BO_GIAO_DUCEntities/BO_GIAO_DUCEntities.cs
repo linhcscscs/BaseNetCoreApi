@@ -172,10 +172,6 @@ public partial class BO_GIAO_DUCEntities : DbContext
 
     public virtual DbSet<NhomDiemDanh> NhomDiemDanhs { get; set; }
 
-    public virtual DbSet<NhomQuyen> NhomQuyens { get; set; }
-
-    public virtual DbSet<NhomQuyenNguoiDung> NhomQuyenNguoiDungs { get; set; }
-
     public virtual DbSet<PhanQuyenApi> PhanQuyenApis { get; set; }
 
     public virtual DbSet<PhieuThu> PhieuThus { get; set; }
@@ -208,7 +204,7 @@ public partial class BO_GIAO_DUCEntities : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=42.112.27.32,21433;initial catalog=QLTP_TEST;persist security info=True;user id=sa;password=QIG@104;MultipleActiveResultSets=True;App=EntityFramework;TrustServerCertificate=True");
+        => optionsBuilder.UseSqlServer("Data Source=42.112.27.32,21433;initial catalog=QUAN_LY_THU_PHI;persist security info=True;user id=sa;password=QIG@104;MultipleActiveResultSets=True;App=EntityFramework;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1070,6 +1066,18 @@ public partial class BO_GIAO_DUCEntities : DbContext
 
             entity.ToTable("DK_KHOAN_THU_SL_DG");
 
+            entity.HasIndex(e => new { e.MaSoGd, e.MaTruong, e.MaCapHoc, e.MaNamHoc, e.HocKy, e.Thang, e.Nam, e.IdKhoanThu, e.IdHocSinh }, "IX_KEY").IsUnique();
+
+            entity.HasIndex(e => new { e.MaNamHoc, e.MaSoGd, e.MaCapHoc, e.MaTruong }, "IX_NAM_SO_CAP_TRUONG");
+
+            entity.HasIndex(e => new { e.MaSoGd, e.MaTruong, e.MaCapHoc, e.MaNamHoc, e.MaHocSinh }, "IX_NAM_SO_CAP_TRUONG_HOC_SINH");
+
+            entity.HasIndex(e => new { e.MaSoGd, e.MaTruong, e.MaCapHoc, e.MaNamHoc, e.IdHocSinh }, "IX_NAM_SO_CAP_TRUONG_ID_HOC_SINH");
+
+            entity.HasIndex(e => new { e.MaNamHoc, e.MaSoGd, e.IdTruong }, "IX_NAM_SO_ID_TRUONG");
+
+            entity.HasIndex(e => new { e.MaNamHoc, e.MaSoGd, e.MaTruong }, "IX_NAM_SO_TRUONG");
+
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.DonGia)
                 .HasColumnType("numeric(18, 2)")
@@ -1125,6 +1133,35 @@ public partial class BO_GIAO_DUCEntities : DbContext
                 .HasColumnName("NGUOI_TAO");
             entity.Property(e => e.SoLuong).HasColumnName("SO_LUONG");
             entity.Property(e => e.Thang).HasColumnName("THANG");
+
+            entity.HasOne(d => d.IdHocSinhNavigation).WithMany(p => p.DkKhoanThuSlDgs)
+                .HasForeignKey(d => d.IdHocSinh)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DK_KHOAN_THU_SL_DG_HOC_SINH");
+
+            entity.HasOne(d => d.IdKhoanThuNavigation).WithMany(p => p.DkKhoanThuSlDgs)
+                .HasForeignKey(d => d.IdKhoanThu)
+                .HasConstraintName("FK_DK_KHOAN_THU_SL_DG_KHOAN_THU");
+
+            entity.HasOne(d => d.IdLopNavigation).WithMany(p => p.DkKhoanThuSlDgs)
+                .HasForeignKey(d => d.IdLop)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DK_KHOAN_THU_SL_DG_LOP");
+
+            entity.HasOne(d => d.IdTruongNavigation).WithMany(p => p.DkKhoanThuSlDgs)
+                .HasForeignKey(d => d.IdTruong)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DK_KHOAN_THU_SL_DG_TRUONG");
+
+            entity.HasOne(d => d.MaCapHocNavigation).WithMany(p => p.DkKhoanThuSlDgs)
+                .HasForeignKey(d => d.MaCapHoc)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DK_KHOAN_THU_SL_DG_DM_CAP_HOC");
+
+            entity.HasOne(d => d.MaNamHocNavigation).WithMany(p => p.DkKhoanThuSlDgs)
+                .HasForeignKey(d => d.MaNamHoc)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DK_KHOAN_THU_SL_DG_NAM_HOC");
         });
 
         modelBuilder.Entity<DkKhoanThuTn>(entity =>
@@ -4577,76 +4614,6 @@ public partial class BO_GIAO_DUCEntities : DbContext
                 .HasColumnName("TEN");
             entity.Property(e => e.ThuTu).HasColumnName("THU_TU");
             entity.Property(e => e.TrangThai).HasColumnName("TRANG_THAI");
-        });
-
-        modelBuilder.Entity<NhomQuyen>(entity =>
-        {
-            entity.ToTable("NhomQuyen");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedOnAdd()
-                .HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.DsMaQuyen).HasColumnName("DS_MA_QUYEN");
-            entity.Property(e => e.MaSoGd)
-                .HasMaxLength(50)
-                .HasColumnName("MA_SO_GD");
-            entity.Property(e => e.MaTruong)
-                .HasMaxLength(50)
-                .HasColumnName("MA_TRUONG");
-            entity.Property(e => e.NgaySua)
-                .HasColumnType("datetime")
-                .HasColumnName("NGAY_SUA");
-            entity.Property(e => e.NgayTao)
-                .HasColumnType("datetime")
-                .HasColumnName("NGAY_TAO");
-            entity.Property(e => e.NguoiSua)
-                .HasMaxLength(150)
-                .HasColumnName("NGUOI_SUA");
-            entity.Property(e => e.NguoiTao)
-                .HasMaxLength(150)
-                .HasColumnName("NGUOI_TAO");
-            entity.Property(e => e.Ten)
-                .HasMaxLength(50)
-                .HasColumnName("TEN");
-        });
-
-        modelBuilder.Entity<NhomQuyenNguoiDung>(entity =>
-        {
-            entity.ToTable("NhomQuyenNguoiDung");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedOnAdd()
-                .HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.MaSoGd)
-                .HasMaxLength(50)
-                .HasColumnName("MA_SO_GD");
-            entity.Property(e => e.MaTruong)
-                .HasMaxLength(50)
-                .HasColumnName("MA_TRUONG");
-            entity.Property(e => e.NgayLap)
-                .HasColumnType("datetime")
-                .HasColumnName("NGAY_LAP");
-            entity.Property(e => e.NgayTao)
-                .HasColumnType("datetime")
-                .HasColumnName("NGAY_TAO");
-            entity.Property(e => e.NguoiDungId).HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.NguoiLap)
-                .HasMaxLength(150)
-                .HasColumnName("NGUOI_LAP");
-            entity.Property(e => e.NguoiTao)
-                .HasMaxLength(150)
-                .HasColumnName("NGUOI_TAO");
-            entity.Property(e => e.NhomQuyenId).HasColumnType("numeric(18, 0)");
-
-            entity.HasOne(d => d.NguoiDung).WithMany(p => p.NhomQuyenNguoiDungs)
-                .HasForeignKey(d => d.NguoiDungId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_NhomQuyenNguoiDung_NGUOI_DUNG");
-
-            entity.HasOne(d => d.NhomQuyen).WithMany(p => p.NhomQuyenNguoiDungs)
-                .HasForeignKey(d => d.NhomQuyenId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_NhomQuyenNguoiDung_NhomQuyen");
         });
 
         modelBuilder.Entity<PhanQuyenApi>(entity =>

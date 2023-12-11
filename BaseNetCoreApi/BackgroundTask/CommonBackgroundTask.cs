@@ -68,7 +68,7 @@ namespace BaseNetCoreApi.BackgroundTask
             {
                 _authenticateService = _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IAuthenticateService>();
             }
-            _authenticateService.CommonBackgroundTask();
+            _authenticateService.ClearRefreshToken();
         }
 
         protected void ClearTempFile()

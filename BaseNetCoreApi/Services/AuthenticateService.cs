@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using static BaseNetCoreApi.Models.ViewModel.AuthResponse;
 
 namespace BaseNetCoreApi.Services
 {
@@ -22,8 +23,7 @@ namespace BaseNetCoreApi.Services
         ReturnCode Login(LoginRequest model, out AuthResponse authResponse);
         ReturnCode RefreshAccessToken(RefreshAccessTokenRequest model, out AuthResponse authResponse);
         void Logout(LogoutRequest model);
-        NguoiDungAuthEntity? GetAuthEntityBySessionId(Guid sessionId, decimal nguoiDungId);
-        void CommonBackgroundTask();
+        void ClearRefreshToken();
     }
     public class AuthenticateService : IAuthenticateService
     {
@@ -32,15 +32,17 @@ namespace BaseNetCoreApi.Services
         private IQiCache _qiCache;
         private IBoGiaoDucContextProvider _contextProvider;
         private IWorkContextService _workContextService;
-        public AuthenticateService(INguoiDungService nguoiDungService, IQiCache qiCache, IPermissionService permissionService, IBoGiaoDucContextProvider contextProvider, IWorkContextService workContextService)
+        private IHttpContextAccessor _httpContextAccessor;
+        public AuthenticateService(INguoiDungService nguoiDungService, IQiCache qiCache, IPermissionService permissionService, IBoGiaoDucContextProvider contextProvider, IWorkContextService workContextService, IHttpContextAccessor httpContextAccessor)
         {
             _nguoiDungService = nguoiDungService;
             _qiCache = qiCache;
             _permissionService = permissionService;
             _contextProvider = contextProvider;
             _workContextService = workContextService;
+            _httpContextAccessor = httpContextAccessor;
         }
-        private string GenerateJwtToken(NguoiDung nguoiDung, Guid sessionId)
+        private string GenerateJwtToken(NguoiDung nguoiDung)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(JWTSettings.Secret);
@@ -48,14 +50,6 @@ namespace BaseNetCoreApi.Services
                 new[] {
                     new Claim(UserClaimKey.NguoiDungId, nguoiDung.Id.ToString()),
                 });
-
-            if (ConfigurationHelper.IsSessionAuth)
-            {
-                claims.AddClaim(new Claim(UserClaimKey.SessionId, sessionId.ToString()));
-            }
-
-            var lstQuyen = _permissionService.GetPermissonGroupByUserAndBranch(nguoiDung).Select(s => s.Code).ToList();
-            claims.AddClaim(new Claim(UserClaimKey.Permissions, string.Join(",", lstQuyen)));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -89,7 +83,7 @@ namespace BaseNetCoreApi.Services
 
             return refreshToken;
         }
-        private AuthResponse GetAuth(NguoiDung nguoiDung)
+        private AuthResponse GetAuth(NguoiDung nguoiDung,string ma_truong, string ma_so_gd, string ma_khoi, string ma_phong_gd)
         {
             var authResponse = new AuthResponse();
             var sessionData = new NguoiDungAuthEntity()
@@ -98,52 +92,55 @@ namespace BaseNetCoreApi.Services
             };
 
 
-            // Lưu vào cache phiên hoạt động
-            var sessionId = Guid.NewGuid();
-            if (ConfigurationHelper.IsSessionAuth)
-            {
-                _qiCache.Set(
-                 key: _qiCache.BuildCachedKey("Auth", nguoiDung.Id, sessionId),
-                 data: sessionData,
-                 cacheTime: JWTSettings.TokenValidityInMinutes
-                 );
-            }
-
             // Get JWT token
-            var accessToken = GenerateJwtToken(nguoiDung, sessionId);
+            var accessToken = GenerateJwtToken(nguoiDung);
             authResponse.AccessToken = accessToken;
 
             // Rf Token
             var refreshToken = GenerateRefreshToken(nguoiDung);
             authResponse.RefreshToken = refreshToken;
 
+            // IsRoot
+            authResponse.IsRoot = nguoiDung.IsRoot == 1 || nguoiDung.IsRootSys == 1 || nguoiDung.IsMasterRootSys == 1;
+
+            // Permission
+            authResponse.Permissions = _permissionService.GetQuyenNguoiDungByNguoiDungByTruongBySo(nguoiDung.Id, ma_truong, ma_so_gd).Select(s => new GroupUserPermission() {
+                URL = s.Menu.Link,
+                MenuName = s.Menu.MenuName,
+                MenuLevel = s.Menu.LevelItem,
+                MenuId = s.Menu.MenuId,
+                IsAdd = s.IsAdd == 1,
+                IsAuth = s.IsAuth == 1,
+                IsDelete = s.IsDelete == 1,
+                IsEdit = s.IsEdit == 1,
+                IsUpload = s.IsUpload == 1,
+                IsView = s.IsView == 1,
+                MenuNameEg = s.Menu.MenuNameEg
+            }).GroupBy(grp => grp.MenuId).Select(s => new GroupUserPermission()
+            {
+                URL = s.FirstOrDefault()?.URL,
+                MenuName = s.FirstOrDefault()?.MenuName,
+                MenuId = s.FirstOrDefault()!.MenuId,
+                MenuLevel = s.FirstOrDefault()?.MenuLevel,
+                MenuNameEg = s.FirstOrDefault()?.MenuNameEg,
+                IsAdd = s.Any(a => a.IsAdd),
+                IsAuth = s.Any(a => a.IsAuth),
+                IsDelete = s.Any(a => a.IsDelete),
+                IsEdit = s.Any(a => a.IsEdit),
+                IsUpload = s.Any(a => a.IsUpload),
+                IsView = s.Any(a => a.IsView)
+            }).ToList();
+
+            // Cookie 
+            _httpContextAccessor.setCookie(UserCookieKey.MA_TRUONG, ma_truong);
+            _httpContextAccessor.setCookie(UserCookieKey.MA_SO_GD, ma_so_gd);
+            _httpContextAccessor.setCookie(UserCookieKey.MA_PHONG_GD, ma_phong_gd);
+            _httpContextAccessor.setCookie(UserCookieKey.MA_KHOI,ma_khoi);
 
             return authResponse;
         }
-
-        public NguoiDungAuthEntity? GetAuthEntityBySessionId(Guid sessionId, decimal nguoiDungId)
-        {
-            try
-            {
-                return _qiCache.Get<NguoiDungAuthEntity>(_qiCache.BuildCachedKey("Auth", nguoiDungId, sessionId));
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
         public void ForceReLogin(List<decimal> nguoiDungIds)
         {
-            // Cache
-            if (ConfigurationHelper.IsSessionAuth)
-            {
-                nguoiDungIds.ForEach(nguoiDungId =>
-                {
-                    _qiCache.RemoveByFirstName(_qiCache.BuildCachedKey("Auth", nguoiDungId));
-                });
-            }
-
             // Refresh Token
             using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
             {
@@ -162,7 +159,7 @@ namespace BaseNetCoreApi.Services
                 ret = new ReturnCode(EReturnCode.WrongUsernameOrPassword);
                 return ret;
             }
-            authResponse = GetAuth(nguoiDung);
+            authResponse = GetAuth(nguoiDung, model.ma_truong, model.ma_so_gd, model.ma_khoi, model.ma_phong_gd);
 
             return ret;
         }
@@ -172,7 +169,7 @@ namespace BaseNetCoreApi.Services
             authResponse = new AuthResponse();
             using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
             {
-                var rftModel = context.RefreshTokens.FirstOrDefault(q => q.NguoiDungId == _workContextService.NguoiDungId && q.Token == model.RefreshToken && q.ExpDate >= DateTime.Now);
+                var rftModel = context.RefreshTokens.FirstOrDefault(q => q.NguoiDungId == model.NguoiDungId && q.Token == model.RefreshToken && q.ExpDate >= DateTime.Now);
                 if (rftModel == null)
                 {
                     ret = new ReturnCode(EReturnCode.TokenInvalid);
@@ -185,7 +182,7 @@ namespace BaseNetCoreApi.Services
                     return ret;
                 }
 
-                var nguoiDung = context.NguoiDungs.FirstOrDefault(q => q.Id == _workContextService.NguoiDungId);
+                var nguoiDung = context.NguoiDungs.FirstOrDefault(q => q.Id == model.NguoiDungId);
                 if (nguoiDung == null)
                 {
                     ret = new ReturnCode(EReturnCode.TokenInvalid);
@@ -196,16 +193,12 @@ namespace BaseNetCoreApi.Services
                 rftModel.Active = false;
                 context.RefreshTokens.Update(rftModel);
                 context.SaveChanges();
-                authResponse = GetAuth(nguoiDung);
+                GetAuth(nguoiDung, model.ma_truong, model.ma_so_gd, model.ma_khoi, model.ma_phong_gd);
             }
             return ret;
         }
         public void Logout(LogoutRequest model)
         {
-            if (ConfigurationHelper.IsSessionAuth)
-            {
-                _qiCache.Remove(_qiCache.BuildCachedKey("Auth", _workContextService.NguoiDungId, _workContextService.SessionId));
-            }
             using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
             {
                 var rftModel = context.RefreshTokens.FirstOrDefault(q => q.NguoiDungId == _workContextService.NguoiDungId && q.Token == model.RefreshToken);
@@ -217,7 +210,7 @@ namespace BaseNetCoreApi.Services
                 }
             }
         }
-        public void CommonBackgroundTask()
+        public void ClearRefreshToken()
         {
             using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
             {

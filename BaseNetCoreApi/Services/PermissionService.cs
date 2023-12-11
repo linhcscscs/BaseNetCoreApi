@@ -1,23 +1,25 @@
 ﻿using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
+using BaseNetCoreApi.Infrastructure.CacheProvider.CacheKey;
 using BaseNetCoreApi.Infrastructure.ContextProvider;
 using BaseNetCoreApi.Infrastructure.Models.BO_GIAO_DUCEntities;
 using BaseNetCoreApi.Models.BO_GIAO_DUCEntities;
 using BaseNetCoreApi.Models.Entities;
 using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Values;
+using Microsoft.EntityFrameworkCore;
+using NPOI.SS.Formula.Functions;
 using System.Linq;
-using static BaseNetCoreApi.Values.ScopePermission;
 
 namespace BaseNetCoreApi.Services
 {
     public interface IPermissionService
     {
-        List<PermissonEntity> GetPermissonEntities();
-        List<NhomQuyen> GetNhomQuyen(string ma_so_gd = "", string ma_truong = "");
-        public List<NhomQuyenNguoiDung> GetNhomQuyenNguoiDung(string ma_so_gd = "", string ma_truong = "", decimal? nguoiDungId = null, decimal? nhomQuyenId = null);
-        public List<PermissonEntity> GetPermissonGroupByUserAndBranch(string ma_so_gd, string ma_truong, decimal nguoiDungId);
-        public List<PermissonEntity> GetPermissonGroupByUserAndBranch(NguoiDung nguoiDung);
+        public Menu? GetMenuByPath(string path);
+        public List<QuyenNguoiDung> GetQuyenNguoiDungByNguoiDung(decimal nguoiDungId);
+        public List<GroupUserMenu> GetGroupUserMenuByNguoiDungByPath(decimal nguoiDungId, string path);
+        public List<GroupUserMenu> GetGroupUserMenuByNguoiDungByPathByTruongBySo(decimal nguoiDungId, string path, string ma_truong, string ma_so_gd);
+        public List<GroupUserMenu> GetQuyenNguoiDungByNguoiDungByTruongBySo(decimal nguoiDungId, string ma_truong, string ma_so_gd);
     }
     public class PermissionService : IPermissionService
     {
@@ -34,103 +36,96 @@ namespace BaseNetCoreApi.Services
         #endregion
 
         #region Method
-        public List<PermissonEntity> GetPermissonEntities()
+        public Menu? GetMenuByPath(string path)
         {
-            var cacheKey = _qiCache.BuildCachedKey("GetPermissonEntities");
-            return _qiCache.GetByKey<List<PermissonEntity>>(
-                getDataSource: () => Enum.GetValues(typeof(EScopePermission)).Cast<EScopePermission>().Select(s => new PermissonEntity(s)).ToList(),
-                key: cacheKey,
-                cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_24_HOURS,
-                isDeepClone: true
-                );
-        }
-
-        public List<NhomQuyen> GetNhomQuyen(string ma_so_gd = "", string ma_truong = "")
-        {
-            var result = new List<NhomQuyen>();
-
             using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, false))
             {
-                var queryable = context.NhomQuyens.AsQueryable();
-                if (string.IsNullOrEmpty(ma_so_gd))
+                if (path[0] != '~')
                 {
-                    queryable = queryable.Where(q => q.MaSoGd == ma_so_gd);
+                    path = "~" + path;
                 }
-                if (string.IsNullOrEmpty(ma_truong))
-                {
-                    queryable = queryable.Where(q => q.MaSoGd == ma_truong);
-                }
-
-                var cacheKey = _qiCache.BuildCachedKey("GetNhomQuyen", ma_truong, ma_so_gd);
-
-                result = _qiCache.GetByKey<List<NhomQuyen>>(
-                    getDataSource: () => queryable.ToList(),
-                    key: cacheKey,
-                    cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_24_HOURS,
-                    isDeepClone: true
-                    );
-
-            };
-            return result;
-        }
-
-        public List<NhomQuyenNguoiDung> GetNhomQuyenNguoiDung(string ma_so_gd = "", string ma_truong = "", decimal? nguoiDungId = null, decimal? nhomQuyenId = null)
-        {
-            var result = new List<NhomQuyenNguoiDung>();
-            var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, false);
-            var queryable = context.NhomQuyenNguoiDungs.AsQueryable();
-            if (nguoiDungId != null)
-            {
-                queryable = queryable.Where(q => q.NguoiDungId == nguoiDungId).AsQueryable();
+                return _qiCache.GetByKey(
+                   getDataSource: () => context.Menus.FirstOrDefault(q => q.Link == path),
+                   key: _qiCache.BuildCachedKey("Menu", "GetMenuByPath", path),
+                   cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_24_HOURS,
+                   isDeepClone: true
+                   );
             }
-            if (nhomQuyenId != null)
-            {
-                queryable = queryable.Where(q => q.NhomQuyenId == nhomQuyenId).AsQueryable();
-            }
-            var cacheKey = _qiCache.BuildCachedKey("GetNhomQuyenNguoiDungByNguoiDung", nguoiDungId?.ToString() ?? "", nhomQuyenId?.ToString() ?? "");
-
-            result = _qiCache.GetByKey<List<NhomQuyenNguoiDung>>(
-                getDataSource: () => queryable.ToList(),
-                key: cacheKey,
-                cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_24_HOURS,
-                isDeepClone: true
-                );
-            return result;
         }
-
-        public List<PermissonEntity> GetPermissonGroupByUserAndBranch(string ma_so_gd, string ma_truong, decimal nguoiDungId)
+        public List<QuyenNguoiDung> GetQuyenNguoiDungByNguoiDung(decimal nguoiDungId)
         {
-            List<PermissonEntity>? result;
             using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, false))
             {
-                var lstIdNhomQuyenId = GetNhomQuyenNguoiDung(nguoiDungId: nguoiDungId,
-                                                        ma_truong: ma_truong,
-                                                        ma_so_gd: ma_so_gd).Select(s => s.NhomQuyenId);
-                var permissions = GetNhomQuyen(ma_so_gd, ma_truong).Where(q => lstIdNhomQuyenId.Contains(q.Id)).Select(s => s.DsMaQuyen);
-                var lstPermissionCode = permissions.Select(s => UltilHelper.ConvertStringToListString(s ?? ""))
-                       .SelectMany(lst => lst).Distinct().ToList();
-                result = GetPermissonEntities().Where(q => lstPermissionCode.Contains(q.Code)).ToList();
+                return _qiCache.GetByKey(
+                   getDataSource: () => context.QuyenNguoiDungs.Where(q => q.IdNguoiDung == nguoiDungId).ToList(),
+                   key: _qiCache.BuildCachedKey(CacheKey.QUYEN, "GetQuyenNguoiDungByNguoiDung", nguoiDungId),
+                   cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
+                   );
             }
-            return result ?? new List<PermissonEntity>();
         }
 
-        public bool HasPermission(string ma_so_gd, string ma_truong, decimal nguoiDungId, EScopePermission permission)
+        public List<GroupUserMenu> GetQuyenNguoiDungByNguoiDungByTruongBySo(decimal nguoiDungId, string ma_truong, string ma_so_gd)
         {
-            return GetPermissonGroupByUserAndBranch(ma_so_gd, ma_truong, nguoiDungId).Any(a => a.ScopePermission == permission);
+            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, false))
+            {
+                var quyenNguoiDungIds = GetQuyenNguoiDungByNguoiDung(nguoiDungId)
+                    .Where(q =>  q.MaTruong == ma_truong && q.MaSoGd == ma_so_gd)
+                    .Select(s => s.IdNhomQuyen).ToList();
+                return _qiCache.GetByKey(
+                   getDataSource: () => context.GroupUserMenus
+                            .Include(i => i.Menu)
+                            .Where(q => quyenNguoiDungIds.Contains(q.GroupUserId))
+                            .ToList(),
+                   key: _qiCache.BuildCachedKey(CacheKey.QUYEN, "GetQuyenNguoiDungByNguoiDungByTruongBySo", nguoiDungId, ma_truong, ma_so_gd),
+                   cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
+                   );
+            }
         }
 
-        public List<PermissonEntity> GetPermissonGroupByUserAndBranch(NguoiDung nguoiDung)
+        public List<GroupUserMenu> GetGroupUserMenuByNguoiDungByPath(decimal nguoiDungId, string path)
         {
-            List<PermissonEntity>? result ;
-            if (nguoiDung.IsRoot == 1)
+            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, false))
             {
-                result = GetPermissonEntities();
+                var result = new List<GroupUserMenu>();
+                var menu = GetMenuByPath(path);
+                if (menu == null)
+                {
+                    return result;
+                }
+
+                var quyenNguoiDungIds = GetQuyenNguoiDungByNguoiDung(nguoiDungId).Select(s => s.IdNhomQuyen).ToList();
+
+                return _qiCache.GetByKey(
+                   getDataSource: () => context.GroupUserMenus
+                            .Where(q => quyenNguoiDungIds.Contains(q.GroupUserId))
+                            .ToList(),
+                   key: _qiCache.BuildCachedKey(CacheKey.QUYEN, "GetGroupUserMenuByNguoiDungByPath", nguoiDungId, path),
+                   cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
+                   );
             }
-            else
+        }
+        public List<GroupUserMenu> GetGroupUserMenuByNguoiDungByPathByTruongBySo(decimal nguoiDungId, string path, string ma_truong, string ma_so_gd)
+        {
+            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, false))
             {
-                result = GetPermissonGroupByUserAndBranch(nguoiDung.MaSoGd, nguoiDung.MaTruong, nguoiDung.Id);
+                var result = new List<GroupUserMenu>();
+                var menu = GetMenuByPath(path);
+
+                if (menu == null)
+                {
+                    return result;
+                }
+
+                var quyenNguoiDungIds = GetQuyenNguoiDungByNguoiDung(nguoiDungId).Where(q => q.MaTruong == ma_truong && q.MaSoGd == ma_so_gd).Select(s => s.IdNhomQuyen).ToList();
+
+                return _qiCache.GetByKey(
+                   getDataSource: () => context.GroupUserMenus
+                            .Where(q => quyenNguoiDungIds.Contains(q.GroupUserId))
+                            .ToList(),
+                   key: _qiCache.BuildCachedKey(CacheKey.QUYEN, "GetGroupUserMenuByNguoiDungByPathByTruongBySo", nguoiDungId, path, ma_truong, ma_so_gd),
+                   cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
+                   );
             }
-            return result ?? new List<PermissonEntity>();
         }
         #endregion
     }

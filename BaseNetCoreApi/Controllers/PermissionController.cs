@@ -1,21 +1,22 @@
 ﻿using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.AttributeCollection;
+using BaseNetCoreApi.Models.Dtos;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static BaseNetCoreApi.Values.ScopePermission;
 
 namespace BaseNetCoreApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class PermissionController : ControllerBase
     {
         #region Contructor
         private INguoiDungService _nguoiDungService;
         private IPermissionService _permissionService;
-        public PermissionController(INguoiDungService nguoiDungService, 
+        public PermissionController(INguoiDungService nguoiDungService,
             IPermissionService permissionService)
         {
             _nguoiDungService = nguoiDungService;
@@ -23,11 +24,12 @@ namespace BaseNetCoreApi.Controllers
         }
         #endregion
 
-        [HasPermission(EScopePermission.TestAPI_R & EScopePermission.TestAPI_W)]
-        [HttpGet]
+        [HasPermission(SysTypeAccess.View | SysTypeAccess.Add)]
+        [HttpGet("GetAllTest/Baocao123")]
         public IActionResult GetAll()
         {
-            return UltilHelper.ReturnSuccess(_permissionService.GetPermissonEntities());
+            return RedirectToAction("GetDMSoGd", "Common", new PaginationRequest<DMSoGdRequestDto>());
+            //return UltilHelper.ReturnSuccess();
         }
     }
 }

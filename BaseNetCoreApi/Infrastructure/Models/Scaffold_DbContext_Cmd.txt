@@ -1,12 +1,12 @@
 --QUAN_LY_THU_PHIEntities--
 
-Scaffold-DbContext "Data Source=42.112.27.32,21433;initial catalog=QLTP_TEST;user id=sa;password=QIG@104;MultipleActiveResultSets=True;App=EntityFramework;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -Namespace BaseNetCoreApi.Models.QUAN_LY_THU_PHIEntities -ContextNamespace BaseNetCoreApi.Infrastructure.Models.QUAN_LY_THU_PHIEntities -OutputDir Infrastructure/Models/QUAN_LY_THU_PHIEntities -Context QUAN_LY_THU_PHIEntities -Force
+Scaffold-DbContext "Data Source=42.112.27.32,21433;initial catalog=QUAN_LY_THU_PHI;user id=sa;password=QIG@104;MultipleActiveResultSets=True;App=EntityFramework;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -Namespace BaseNetCoreApi.Models.QUAN_LY_THU_PHIEntities -ContextNamespace BaseNetCoreApi.Infrastructure.Models.QUAN_LY_THU_PHIEntities -OutputDir Infrastructure/Models/QUAN_LY_THU_PHIEntities -Context QUAN_LY_THU_PHIEntities -Force
 
 --
 
 
 --BO_GIAO_DUCEntities--
 
-Scaffold-DbContext "Data Source=42.112.27.32,21433;initial catalog=QLTP_TEST;persist security info=True;user id=sa;password=QIG@104;MultipleActiveResultSets=True;App=EntityFramework;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -Namespace BaseNetCoreApi.Models.BO_GIAO_DUCEntities -ContextNamespace BaseNetCoreApi.Infrastructure.Models.BO_GIAO_DUCEntities -OutputDir Infrastructure/Models/BO_GIAO_DUCEntities -Context BO_GIAO_DUCEntities -Force
+Scaffold-DbContext "Data Source=42.112.27.32,21433;initial catalog=QUAN_LY_THU_PHI;persist security info=True;user id=sa;password=QIG@104;MultipleActiveResultSets=True;App=EntityFramework;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -Namespace BaseNetCoreApi.Models.BO_GIAO_DUCEntities -ContextNamespace BaseNetCoreApi.Infrastructure.Models.BO_GIAO_DUCEntities -OutputDir Infrastructure/Models/BO_GIAO_DUCEntities -Context BO_GIAO_DUCEntities -Force
 
 --

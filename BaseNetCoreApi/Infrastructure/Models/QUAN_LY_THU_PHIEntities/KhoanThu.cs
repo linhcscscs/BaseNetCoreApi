@@ -79,6 +79,8 @@ public partial class KhoanThu
 
     public virtual ICollection<DiemDanhKhoanThu> DiemDanhKhoanThus { get; set; } = new List<DiemDanhKhoanThu>();
 
+    public virtual ICollection<DkKhoanThuSlDg> DkKhoanThuSlDgs { get; set; } = new List<DkKhoanThuSlDg>();
+
     public virtual ICollection<DkKhoanThuTn> DkKhoanThuTns { get; set; } = new List<DkKhoanThuTn>();
 
     public virtual ICollection<DotThuKhoanThu> DotThuKhoanThus { get; set; } = new List<DotThuKhoanThu>();

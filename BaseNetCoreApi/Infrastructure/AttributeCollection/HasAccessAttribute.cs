@@ -11,12 +11,12 @@ using BaseNetCoreApi.Values;
 namespace BaseNetCoreApi.Infrastructure.AttributeCollection
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class HasPermissionAttribute : Attribute, IAuthorizationFilter
+    public class HasAccessAttribute : Attribute, IAuthorizationFilter
     {
-        private SysTypeAccess _sysTypeAccess;
-        public HasPermissionAttribute(SysTypeAccess sysTypeAccess)
+        private string _route;
+        public HasAccessAttribute(string route)
         {
-            _sysTypeAccess = sysTypeAccess;
+            _route = route;
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
@@ -27,42 +27,20 @@ namespace BaseNetCoreApi.Infrastructure.AttributeCollection
 
             // authorization
             var workcontext = context.HttpContext.RequestServices.GetService<IWorkContextService>();
-
             if (!workcontext.IsAuthenticated)
             {
                 context.Result = UltilHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Unauthorized));
                 return;
             }
-            var permissons = workcontext.Permissons;
             if (workcontext.IsRoot)
             {
                 return;
             }
-            
+            var permissons = workcontext.Permissons;
+            String originalPath = new Uri(workcontext.FullRequestURL).OriginalString;
+            String parentDirectory = originalPath.Substring(0, originalPath.LastIndexOf("/"));
             var hasPermission = false;
-            switch (_sysTypeAccess)
-            {
-                case SysTypeAccess.View:
-                    hasPermission = permissons.Any(q => q.IsView == 1);
-                    break;
-                case SysTypeAccess.Add:
-                    hasPermission = permissons.Any(q => q.IsAdd == 1);
-                    break;
-                case SysTypeAccess.Edit:
-                    hasPermission = permissons.Any(q => q.IsEdit == 1);
-                    break;
-                case SysTypeAccess.Delete:
-                    hasPermission = permissons.Any(q => q.IsDelete == 1);
-                    break;
-                case SysTypeAccess.Upload:
-                    hasPermission = permissons.Any(q => q.IsUpload == 1);
-                    break;
-                case SysTypeAccess.Auth:
-                    hasPermission = permissons.Any(q => q.IsAuth == 1);
-                    break;
-                default:
-                    break;
-            }
+
             if (!hasPermission)
             {
                 context.Result = UltilHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Forbidden));

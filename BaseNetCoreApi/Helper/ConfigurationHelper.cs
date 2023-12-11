@@ -97,5 +97,12 @@
                 return maxPageSize;
             }
         }
+        public static string CookieSecret
+        {
+            get
+            {
+                return GetConfigByName("AppSettings:CookieSecret");
+            }
+        }
     }
 }

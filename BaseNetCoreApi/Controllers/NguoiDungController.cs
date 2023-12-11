@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaseNetCoreApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]/[action]")]
     public class NguoiDungController : ControllerBase
     {
         private readonly ILogger<NguoiDungController> _logger;
@@ -16,7 +16,7 @@ namespace BaseNetCoreApi.Controllers
             _nguoiDungService = nguoiDungService;
         }
 
-        [HttpGet()]
+        [HttpGet]
         public IActionResult Get(int ma_nam_hoc, decimal Id )
         {
             try

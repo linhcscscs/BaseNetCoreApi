@@ -19,15 +19,10 @@ namespace BaseNetCoreApi.Middleware
             }
             var user = httpContext.User!;
             var snguoiDingId = AuthHelper.GetByClaim(user, UserClaimKey.NguoiDungId);
-            var sSessionId = AuthHelper.GetByClaim(user, UserClaimKey.SessionId);
             if (int.TryParse(snguoiDingId, out var NguoiDungId))
             {
                 workContext.NguoiDungId = NguoiDungId;
             };
-            if (Guid.TryParse(sSessionId, out var SessionId))
-            {
-                workContext.SessionId = SessionId;
-            }
         nextSection:
             await _next(httpContext);
         }

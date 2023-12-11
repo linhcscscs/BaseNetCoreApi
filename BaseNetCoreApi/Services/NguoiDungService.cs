@@ -50,7 +50,22 @@ namespace BaseNetCoreApi.Services
             {
                 detail = context.NguoiDungs.FirstOrDefault(q =>
                 q.TenDangNhap == model.Username && q.MatKhau == hashedPassword &&
-                ((q.MaTruong == model.MA_TRUONG && q.MaSoGd == model.MA_SO_GD) || q.IsRoot == 1));
+                ((q.MaTruong == model.ma_truong && q.MaSoGd == model.ma_so_gd && q.MaNamHoc == _workContextService.MA_NAM_HOC) 
+                || q.IsMasterRootSys == 1));
+            }
+            return detail;
+        }
+        public NguoiDung? GetByNguoiDungId(RefreshAccessTokenRequest model)
+        {
+            var ma_nam_hoc = _workContextService.MA_NAM_HOC;
+
+            NguoiDung? detail;
+            using (var context = _contextProvider.GetContext(ma_nam_hoc, false))
+            {
+                detail = context.NguoiDungs.FirstOrDefault(q =>
+                q.Id == model.NguoiDungId &&
+                ((q.MaTruong == model.ma_truong && q.MaSoGd == model.ma_so_gd && q.MaNamHoc == _workContextService.MA_NAM_HOC)
+                || q.IsMasterRootSys == 1));
             }
             return detail;
         }

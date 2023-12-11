@@ -1,7 +1,6 @@
 ﻿using BaseNetCoreApi.Infrastructure.AttributeCollection;
 using System.ComponentModel;
 using System.Reflection;
-using static BaseNetCoreApi.Values.ScopePermission;
 
 namespace BaseNetCoreApi.Helper
 {
@@ -34,9 +33,8 @@ namespace BaseNetCoreApi.Helper
             if (ret == 0) ret = 500;
             return ret;
         }
-        public static EScopePermission GetParentScopePermission(this Enum GenericEnum) => GetAttribute<ParentScopeAttribute, EScopePermission>(GenericEnum);
         public static valueType? GetAttribute<Atribute, valueType>(this Enum GenericEnum)
-            where Atribute : Attribute, ICustomeAttribute<valueType>
+            where Atribute : Attribute, ICustomAttribute<valueType>
         {
             Type genericEnumType = GenericEnum.GetType();
             MemberInfo[] memberInfo = genericEnumType.GetMember(GenericEnum.ToString());
