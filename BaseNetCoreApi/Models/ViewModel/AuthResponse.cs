@@ -5,6 +5,7 @@
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
         public bool IsRoot { get; set; }
+        public bool IsMasterRoot { get; set; }
         public List<GroupUserPermission>? Permissions { get; set; }
         public partial class GroupUserPermission
         {

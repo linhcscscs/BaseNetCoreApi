@@ -1,6 +1,5 @@
 ﻿using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.AttributeCollection;
-using BaseNetCoreApi.Models.Dtos;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Services;
 using BaseNetCoreApi.Values;
@@ -16,7 +15,7 @@ namespace BaseNetCoreApi.Controllers
         #region Contructor
         private INguoiDungService _nguoiDungService;
         private IPermissionService _permissionService;
-        public PermissionController(INguoiDungService nguoiDungService,
+        public PermissionController(INguoiDungService nguoiDungService, 
             IPermissionService permissionService)
         {
             _nguoiDungService = nguoiDungService;
@@ -28,8 +27,7 @@ namespace BaseNetCoreApi.Controllers
         [HttpGet("GetAllTest/Baocao123")]
         public IActionResult GetAll()
         {
-            return RedirectToAction("GetDMSoGd", "Common", new PaginationRequest<DMSoGdRequestDto>());
-            //return UltilHelper.ReturnSuccess();
+            return UltilHelper.ReturnSuccess();
         }
     }
 }

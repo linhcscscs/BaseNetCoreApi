@@ -22,6 +22,8 @@ namespace BaseNetCoreApi.Controllers
             try
             {
                 var ret = _nguoiDungService.GetByNguoiDungId(Id, ma_nam_hoc);
+
+
                 return Ok(ret);
             }
             catch(Exception ex)

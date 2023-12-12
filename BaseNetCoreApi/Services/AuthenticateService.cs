@@ -6,6 +6,7 @@ using BaseNetCoreApi.Models.BO_GIAO_DUCEntities;
 using BaseNetCoreApi.Models.Entities;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Service;
+using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.DataProtection;
@@ -18,13 +19,6 @@ using static BaseNetCoreApi.Models.ViewModel.AuthResponse;
 
 namespace BaseNetCoreApi.Services
 {
-    public interface IAuthenticateService
-    {
-        ReturnCode Login(LoginRequest model, out AuthResponse authResponse);
-        ReturnCode RefreshAccessToken(RefreshAccessTokenRequest model, out AuthResponse authResponse);
-        void Logout(LogoutRequest model);
-        void ClearRefreshToken();
-    }
     public class AuthenticateService : IAuthenticateService
     {
         private INguoiDungService _nguoiDungService;
@@ -101,7 +95,8 @@ namespace BaseNetCoreApi.Services
             authResponse.RefreshToken = refreshToken;
 
             // IsRoot
-            authResponse.IsRoot = nguoiDung.IsRoot == 1 || nguoiDung.IsRootSys == 1 || nguoiDung.IsMasterRootSys == 1;
+            authResponse.IsRoot = nguoiDung.IsRoot == 1;
+            authResponse.IsMasterRoot = nguoiDung.IsMasterRootSys == 1;
 
             // Permission
             authResponse.Permissions = _permissionService.GetQuyenNguoiDungByNguoiDungByTruongBySo(nguoiDung.Id, ma_truong, ma_so_gd).Select(s => new GroupUserPermission() {

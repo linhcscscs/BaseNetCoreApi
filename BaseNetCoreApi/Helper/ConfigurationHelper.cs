@@ -25,19 +25,6 @@
                 return ma_nam_hoc;
             }
         }
-
-        public static bool IsSessionAuth
-        {
-            get
-            {
-                var isSessionAuth = false;
-                if (bool.TryParse(GetConfigByName("AppSettings:IsSessionAuth"), out var isSessionAuthTemp))
-                {
-                    isSessionAuth = isSessionAuthTemp;
-                }
-                return isSessionAuth;
-            }
-        }
         public static int UploadFileLimit
         {
             get

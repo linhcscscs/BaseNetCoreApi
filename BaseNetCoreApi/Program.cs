@@ -14,12 +14,14 @@ using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 
@@ -51,6 +53,7 @@ IConfiguration config = new ConfigurationBuilder()
                           .Build();
 var services = builder.Services;
 #endregion
+
 #region CORS
 var lstCors = config.GetSection("AppSettings:CORSUrls").GetChildren().Select(
         s => s.Value?.ToString()).ToArray() ?? new string[0];
@@ -62,7 +65,9 @@ if (lstCors.Count() > 0)
                           policy =>
                           {
                               policy.WithOrigins(lstCors!)
-                              .AllowAnyMethod();
+                              .AllowAnyMethod()
+                              .AllowCredentials()
+                              .AllowAnyHeader();
                           });
     });
 }
@@ -78,6 +83,7 @@ else
                                   policy.AllowAnyHeader();
                                   policy.AllowAnyMethod();
                                   policy.AllowAnyOrigin();
+                                  policy.AllowCredentials();
                               });
         });
     }
@@ -88,13 +94,16 @@ else
             options.AddPolicy(name: QI_CORS,
                               policy =>
                               {
-                                  policy.WithOrigins("")
-                              .AllowAnyMethod();
+                                  policy.AllowAnyHeader();
+                                  policy.AllowAnyMethod();
+                                  policy.AllowAnyOrigin();
+                                  policy.AllowCredentials();
                               });
         });
     }
 }
 #endregion
+
 #region Bindding Configure Helper
 ConfigurationHelper.Configuration = config;
 ConfigurationHelper.WebHostEnvironment = builder.Environment;
@@ -211,6 +220,23 @@ services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = ConfigurationHelper.UploadFileLimit; // if don't set default value is: 128 MB
     options.MultipartHeadersLengthLimit = ConfigurationHelper.UploadFileLimit;
 });
+
+// Compression
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.SmallestSize;
+});
+
 #endregion
 #endregion
 
@@ -234,6 +260,8 @@ app.UseCors(QI_CORS);
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseResponseCompression();
+
 app.UseMiddleware<WorkContextMiddleware>();
 
 app.MapControllers();

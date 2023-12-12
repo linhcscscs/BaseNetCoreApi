@@ -15,17 +15,6 @@ using System.Text.Json;
 
 namespace BaseNetCoreApi.Services
 {
-    public interface ICommonService
-    {
-        PaginationResponse<SoGd> GetSoGd(PaginationRequest<SoGdRequestDto> model);
-        PaginationResponse<DMSoGd> GetDMSoGd(PaginationRequest<DMSoGdRequestDto> model);
-        SoGd? GetSoGdByMa(string Ma);
-        PaginationResponse<PhongGd> GetPhongGd(PaginationRequest<PhongGdRequestDto> model);
-        PaginationResponse<DMPhongGd> GetDMPhongGd(PaginationRequest<DMPhongGdRequestDto> model);
-        PaginationResponse<Truong> GetTruongPagination(PaginationRequest<TruongRequestDto> model);
-        PaginationResponse<DMTruong> GetDMTruong(PaginationRequest<DMTruongRequestDto> model);
-        List<DMCapHoc> GetDMCapHoc();
-    }
     public class CommonService : ICommonService
     {
         private IContextDomainService _contextDomainService;
