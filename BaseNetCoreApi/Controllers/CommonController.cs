@@ -3,6 +3,7 @@ using BaseNetCoreApi.Infrastructure.ContextProvider;
 using BaseNetCoreApi.Models.Dtos;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

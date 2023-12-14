@@ -9,6 +9,7 @@ using BaseNetCoreApi.Models.Dtos;
 using BaseNetCoreApi.Models.QUAN_LY_THU_PHIEntities;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Service;
+using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using System.Runtime.Caching;
 using System.Text.Json;

@@ -10,6 +10,7 @@ using BaseNetCoreApi.Models.Entities;
 using BaseNetCoreApi.Models.Model;
 using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
