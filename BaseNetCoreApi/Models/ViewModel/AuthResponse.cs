@@ -4,8 +4,9 @@
     {
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
+        public decimal NguoiDungId {  get; set; }
         public bool IsRoot { get; set; }
-        public bool IsMasterRoot { get; set; }
+        public bool IsRootSys { get; set; }
         public List<GroupUserPermission>? Permissions { get; set; }
         public partial class GroupUserPermission
         {

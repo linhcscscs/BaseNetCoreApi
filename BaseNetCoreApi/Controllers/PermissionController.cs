@@ -2,6 +2,7 @@
 using BaseNetCoreApi.Infrastructure.AttributeCollection;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,20 +15,18 @@ namespace BaseNetCoreApi.Controllers
     {
         #region Contructor
         private INguoiDungService _nguoiDungService;
-        private IPermissionService _permissionService;
-        public PermissionController(INguoiDungService nguoiDungService, 
-            IPermissionService permissionService)
+        public PermissionController(
+            INguoiDungService nguoiDungService)
         {
             _nguoiDungService = nguoiDungService;
-            _permissionService = permissionService;
         }
         #endregion
 
-        [HasPermission(SysTypeAccess.View | SysTypeAccess.Add)]
+        //[HasPermission(SysTypeAccess.View | SysTypeAccess.Add)]
         [HttpGet("GetAllTest/Baocao123")]
         public IActionResult GetAll()
         {
-            return UltilHelper.ReturnSuccess();
+            return UltilHelper.ReturnSuccess(_nguoiDungService.GetByNguoiDungId(1));
         }
     }
 }

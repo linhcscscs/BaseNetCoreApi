@@ -1,6 +1,7 @@
 ﻿using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Models.Model;
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Services.Interface;
 using System.Threading.Channels;
 
 namespace BaseNetCoreApi.BackgroundTask

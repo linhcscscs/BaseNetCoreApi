@@ -20,6 +20,12 @@ namespace BaseNetCoreApi.Helper
         {
             return stringValue.Split(new char[] { ',' }).ToList();
         }
+        public static string ListToStringQuery<T>(List<T> lst)
+        {
+            var listString = lst.Select(x => $"'{x}'").ToList();
+            var lstQuery = string.Join(",", listString.ToArray());
+            return lstQuery;
+        }
         public static IActionResult ReturnSuccess(object? responseData = null)
         {
             return new OkObjectResult(new ResponseModel(responseData));

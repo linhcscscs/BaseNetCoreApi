@@ -1,6 +1,7 @@
 ﻿using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

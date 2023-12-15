@@ -9,13 +9,11 @@ namespace BaseNetCoreApi.Models.ViewModel
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
-        [Required(ErrorMessage = "ma_so_gd is required")]
-        public string ma_so_gd { get; set; }
-        [Required(ErrorMessage = "ma_truong is required")]
-        public string ma_truong { get; set; }
-        [Required(ErrorMessage = "ma_khoi is required")]
-        public string ma_khoi { get; set; }
-        [Required(ErrorMessage = "ma_phong_gd is required")]
-        public string ma_phong_gd { get; set; }
+        [Required(ErrorMessage = "ma_tinh is required")]
+        public string ma_tinh { get; set; }
+        [Required(ErrorMessage = "ma_huyen is required")]
+        public string ma_huyen { get; set; }
+        [Required(ErrorMessage = "ma_xa is required")]
+        public string ma_xa { get; set; }
     }
 }

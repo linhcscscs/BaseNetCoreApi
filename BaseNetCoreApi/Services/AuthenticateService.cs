@@ -1,15 +1,14 @@
 ﻿using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
-using BaseNetCoreApi.Infrastructure.ContextProvider;
-using BaseNetCoreApi.Infrastructure.Models.BO_GIAO_DUCEntities;
-using BaseNetCoreApi.Models.BO_GIAO_DUCEntities;
-using BaseNetCoreApi.Models.Entities;
+using BaseNetCoreApi.Infrastructure.ContextProvider.Interface;
+using BaseNetCoreApi.Infrastructure.Repository.Interface;
+using BaseNetCoreApi.Models.PHO_CAP_GDEntities;
+using BaseNetCoreApi.Models.Repository;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using EFCore.BulkExtensions;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,10 +23,20 @@ namespace BaseNetCoreApi.Services
         private INguoiDungService _nguoiDungService;
         private IPermissionService _permissionService;
         private IQiCache _qiCache;
-        private IBoGiaoDucContextProvider _contextProvider;
+        private IPhoCapGDContextProvider _contextProvider;
         private IWorkContextService _workContextService;
         private IHttpContextAccessor _httpContextAccessor;
-        public AuthenticateService(INguoiDungService nguoiDungService, IQiCache qiCache, IPermissionService permissionService, IBoGiaoDucContextProvider contextProvider, IWorkContextService workContextService, IHttpContextAccessor httpContextAccessor)
+        private IUnitOfWork _unitOfWork;
+        private IRefreshTokenRepository _refreshTokenRepository;
+        public AuthenticateService(
+            INguoiDungService nguoiDungService,
+            IQiCache qiCache,
+            IPermissionService permissionService,
+            IPhoCapGDContextProvider contextProvider,
+            IWorkContextService workContextService,
+            IHttpContextAccessor httpContextAccessor,
+            IUnitOfWork unitOfWork,
+            IRefreshTokenRepository refreshTokenRepository)
         {
             _nguoiDungService = nguoiDungService;
             _qiCache = qiCache;
@@ -35,6 +44,8 @@ namespace BaseNetCoreApi.Services
             _contextProvider = contextProvider;
             _workContextService = workContextService;
             _httpContextAccessor = httpContextAccessor;
+            _unitOfWork = unitOfWork;
+            _refreshTokenRepository = refreshTokenRepository;
         }
         private string GenerateJwtToken(NguoiDung nguoiDung)
         {
@@ -71,20 +82,17 @@ namespace BaseNetCoreApi.Services
                     NguoiDungId = nguoiDung.Id,
                     Token = refreshToken,
                 };
-                context.RefreshTokens.Add(rftModel);
+                _refreshTokenRepository.InsertOrUpdate(rftModel);
                 context.SaveChanges();
             }
 
             return refreshToken;
         }
-        private AuthResponse GetAuth(NguoiDung nguoiDung,string ma_truong, string ma_so_gd, string ma_khoi, string ma_phong_gd)
+        private AuthResponse GetAuth(NguoiDung nguoiDung,string ma_tinh, string ma_huyen, string ma_xa)
         {
             var authResponse = new AuthResponse();
-            var sessionData = new NguoiDungAuthEntity()
-            {
-                NguoiDungId = nguoiDung.Id,
-            };
 
+            authResponse.NguoiDungId = nguoiDung.Id;
 
             // Get JWT token
             var accessToken = GenerateJwtToken(nguoiDung);
@@ -96,10 +104,10 @@ namespace BaseNetCoreApi.Services
 
             // IsRoot
             authResponse.IsRoot = nguoiDung.IsRoot == 1;
-            authResponse.IsMasterRoot = nguoiDung.IsMasterRootSys == 1;
+            authResponse.IsRootSys = nguoiDung.IsRootSys == 1;
 
             // Permission
-            authResponse.Permissions = _permissionService.GetQuyenNguoiDungByNguoiDungByTruongBySo(nguoiDung.Id, ma_truong, ma_so_gd).Select(s => new GroupUserPermission() {
+            authResponse.Permissions = _permissionService.GetGroupUserMenuByNguoiDung(nguoiDung.Id).Select(s => new GroupUserPermission() {
                 URL = s.Menu.Link,
                 MenuName = s.Menu.MenuName,
                 MenuLevel = s.Menu.LevelItem,
@@ -127,10 +135,9 @@ namespace BaseNetCoreApi.Services
             }).ToList();
 
             // Cookie 
-            _httpContextAccessor.setCookie(UserCookieKey.MA_TRUONG, ma_truong);
-            _httpContextAccessor.setCookie(UserCookieKey.MA_SO_GD, ma_so_gd);
-            _httpContextAccessor.setCookie(UserCookieKey.MA_PHONG_GD, ma_phong_gd);
-            _httpContextAccessor.setCookie(UserCookieKey.MA_KHOI,ma_khoi);
+            _httpContextAccessor.setCookie(UserCookieKey.MA_HUYEN, ma_tinh);
+            _httpContextAccessor.setCookie(UserCookieKey.MA_TINH, ma_huyen);
+            _httpContextAccessor.setCookie(UserCookieKey.MA_XA, ma_xa);
 
             return authResponse;
         }
@@ -154,7 +161,7 @@ namespace BaseNetCoreApi.Services
                 ret = new ReturnCode(EReturnCode.WrongUsernameOrPassword);
                 return ret;
             }
-            authResponse = GetAuth(nguoiDung, model.ma_truong, model.ma_so_gd, model.ma_khoi, model.ma_phong_gd);
+            authResponse = GetAuth(nguoiDung, model.ma_tinh, model.ma_huyen, model.ma_xa);
 
             return ret;
         }
@@ -188,7 +195,8 @@ namespace BaseNetCoreApi.Services
                 rftModel.Active = false;
                 context.RefreshTokens.Update(rftModel);
                 context.SaveChanges();
-                GetAuth(nguoiDung, model.ma_truong, model.ma_so_gd, model.ma_khoi, model.ma_phong_gd);
+
+                authResponse = GetAuth(nguoiDung, model.ma_tinh, model.ma_huyen, model.ma_xa);
             }
             return ret;
         }

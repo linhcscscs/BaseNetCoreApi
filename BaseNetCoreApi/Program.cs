@@ -1,18 +1,18 @@
 using BaseNetCoreApi.BackgroundTask;
-using BaseNetCoreApi.DomainService;
 using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
 using BaseNetCoreApi.Infrastructure.ContextProvider;
-using BaseNetCoreApi.Infrastructure.Models.BO_GIAO_DUCEntities;
-using BaseNetCoreApi.Infrastructure.Models.QUAN_LY_THU_PHIEntities;
+using BaseNetCoreApi.Infrastructure.ContextProvider.Interface;
+using BaseNetCoreApi.Infrastructure.Models.PHO_CAP_GDEntities;
+using BaseNetCoreApi.Infrastructure.Repository;
+using BaseNetCoreApi.Infrastructure.Repository.Interface;
 using BaseNetCoreApi.Middleware;
-using BaseNetCoreApi.Models.Entities;
-using BaseNetCoreApi.Models.Model;
+using BaseNetCoreApi.Models.Repository;
 using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -109,10 +109,8 @@ ConfigurationHelper.Configuration = config;
 ConfigurationHelper.WebHostEnvironment = builder.Environment;
 #endregion
 #region DBContext
-services.AddDbContext<BO_GIAO_DUCEntities>(options =>
-                options.UseSqlServer(config.GetConnectionString("ConnectionStrings:BO_GIAO_DUCEntities")));
-services.AddDbContext<QUAN_LY_THU_PHIEntities>(options =>
-                options.UseSqlServer(config.GetConnectionString("ConnectionStrings:QUAN_LY_THU_PHIEntities")));
+services.AddDbContext<PHO_CAP_GDEntities>(options =>
+                options.UseSqlServer(config.GetConnectionString("ConnectionStrings:PHO_CAP_GDEntities")));
 #endregion
 #region JWT Authen
 builder.Services.AddAuthentication(options =>
@@ -181,17 +179,23 @@ services.AddSwaggerGen(c =>
 #endregion
 #region DI
 #region Service
-services.AddTransient<IBoGiaoDucContextProvider, BoGiaoDucContextProvider>();
-services.AddTransient<IQuanLyThuPhiContextProvider, QuanLyThuPhiContextProvider>();
 services.AddSingleton<IQiCache, QiCache>();
 services.AddTransient<INguoiDungService, NguoiDungService>();
 services.AddScoped<IWorkContextService, WorkContextService>();
 services.AddTransient<IPermissionService, PermissionService>();
 services.AddTransient<IAuthenticateService, AuthenticateService>();
-services.AddTransient<ICommonService, CommonService>();
 #endregion
-#region DomainService
-services.AddTransient<IContextDomainService, ContextDomainService>();
+#region Repository
+#region Base Repository
+services.AddScoped<IPhoCapGDContextProvider, PhoCapGDContextProvider>();
+services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+services.AddScoped<IUnitOfWork, UnitOfWork>();
+#endregion
+services.AddScoped<IMenuRepository, MenuRepository>();
+services.AddScoped<IGroupUserMenuRepository, GroupUserMenuRepository>();
+services.AddScoped<IGroupUserRepository, GroupUserRepository>();
+services.AddScoped<INguoiDungRepository, NguoiDungRepository>();
+services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 #endregion
 #region Background Service
 // Hosted Service

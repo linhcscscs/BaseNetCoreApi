@@ -1,4 +1,4 @@
-﻿using BaseNetCoreApi.Infrastructure.Models.QUAN_LY_THU_PHIEntities;
+﻿using BaseNetCoreApi.Infrastructure.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Models.Entities;
 using BaseNetCoreApi.Values;
 using Microsoft.EntityFrameworkCore;

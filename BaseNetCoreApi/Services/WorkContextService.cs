@@ -1,10 +1,8 @@
-﻿using BaseNetCoreApi.DomainService;
-using BaseNetCoreApi.Helper;
-using BaseNetCoreApi.Infrastructure.ContextProvider;
-using BaseNetCoreApi.Infrastructure.Models.BO_GIAO_DUCEntities;
-using BaseNetCoreApi.Models.BO_GIAO_DUCEntities;
-using BaseNetCoreApi.Models.Entities;
+﻿using BaseNetCoreApi.Helper;
+using BaseNetCoreApi.Models.PHO_CAP_GDEntities;
+using BaseNetCoreApi.Models.Repository;
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Http.Extensions;
 
@@ -15,12 +13,12 @@ namespace BaseNetCoreApi.Service
         public decimal NguoiDungId { get; set; }
         public int MA_NAM_HOC { get; }
         public NguoiDung NguoiDung { get; }
-        public string MA_SO_GD { get; }
-        public string MA_TRUONG { get; }
-        public string MA_KHOI { get; }
-        public string MA_PHONG_GD { get; }
+        public string MA_TINH { get; }
+        public string MA_HUYEN { get; }
+        public string MA_XA { get; }
         public List<GroupUserMenu> Permissons { get; }
         public bool IsRoot { get; }
+        public bool IsRootSys { get; }
         public bool IsAuthenticated { get; }
         public string RequestPath { get; }
         public string FullRequestURL { get; }
@@ -31,7 +29,9 @@ namespace BaseNetCoreApi.Service
         #region Contructor
         private IServiceProvider _serviceProvider;
         private IHttpContextAccessor _httpContextAccessor;
-        public WorkContextService(IServiceProvider serviceProvider, IHttpContextAccessor httpContextAccessor)
+        public WorkContextService(
+            IServiceProvider serviceProvider,
+            IHttpContextAccessor httpContextAccessor)
         {
             _serviceProvider = serviceProvider;
             _httpContextAccessor = httpContextAccessor;
@@ -42,7 +42,7 @@ namespace BaseNetCoreApi.Service
         private int? ma_nam_hoc = null;
         private Guid? _sessionId = null;
         private decimal? _nguoiDungId = null;
-        private INguoiDungService _nguoiDungService;
+        private INguoiDungRepository _nguoiDungRepository;
         private IPermissionService _permissionService;
         public decimal NguoiDungId
         {
@@ -72,64 +72,72 @@ namespace BaseNetCoreApi.Service
             {
                 if (_nguoiDung == null && _nguoiDungId != null)
                 {
-                    if (_nguoiDungService == null)
+                    if (_nguoiDungRepository == null)
                     {
-                        _nguoiDungService = _serviceProvider.GetService<INguoiDungService>()!;
+                        _nguoiDungRepository = _serviceProvider.GetService<INguoiDungRepository>()!;
                     }
-                    _nguoiDung = _nguoiDungService.GetByNguoiDungId(NguoiDungId);
+                    _nguoiDung = _nguoiDungRepository.GetById(NguoiDungId) ?? new NguoiDung();
                 }
-                return _nguoiDung;
+                return _nguoiDung!;
             }
         }
-        public string MA_SO_GD
+        public string MA_TINH
         {
             get
             {
-                if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_SO_GD)))
+                if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_TINH)))
                 {
-                    return _httpContextAccessor.getCookie(UserCookieKey.MA_SO_GD)!;
+                    return _httpContextAccessor.getCookie(UserCookieKey.MA_TINH)!;
                 }
                 else
                 {
-                    _httpContextAccessor.setCookie(UserCookieKey.MA_SO_GD, NguoiDung?.MaSoGd ?? "");
-                    return NguoiDung?.MaSoGd ?? "";
+                    _httpContextAccessor.setCookie(UserCookieKey.MA_TINH, NguoiDung?.MaTinh ?? "");
+                    return NguoiDung?.MaTinh ?? "";
                 }
             }
         }
-        public string MA_TRUONG
+        public string MA_HUYEN
         {
             get
             {
-                if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_TRUONG)))
+                if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_HUYEN)))
                 {
-                    return _httpContextAccessor.getCookie(UserCookieKey.MA_TRUONG)!;
+                    return _httpContextAccessor.getCookie(UserCookieKey.MA_HUYEN)!;
                 }
                 else
                 {
-                    _httpContextAccessor.setCookie(UserCookieKey.MA_TRUONG, NguoiDung?.MaTruong ?? "");
-                    return NguoiDung?.MaTruong ?? "";
+                    _httpContextAccessor.setCookie(UserCookieKey.MA_HUYEN, NguoiDung?.MaHuyen ?? "");
+                    return NguoiDung?.MaHuyen ?? "";
                 }
             }
         }
-        public string MA_KHOI
+        public string MA_XA
         {
             get
             {
-                return _httpContextAccessor.getCookie(UserCookieKey.MA_KHOI) ?? "";
-            }
-        }
-        public string MA_PHONG_GD
-        {
-            get
-            {
-                return _httpContextAccessor.getCookie(UserCookieKey.MA_PHONG_GD) ?? "";
+                if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_XA)))
+                {
+                    return _httpContextAccessor.getCookie(UserCookieKey.MA_XA)!;
+                }
+                else
+                {
+                    _httpContextAccessor.setCookie(UserCookieKey.MA_XA, NguoiDung?.MaXa ?? "");
+                    return NguoiDung?.MaHuyen ?? "";
+                }
             }
         }
         public bool IsRoot
         {
             get
             {
-                return NguoiDung.IsRoot == 1 || NguoiDung.IsMasterRootSys == 1 || NguoiDung.IsRoot == 1;
+                return NguoiDung.IsRoot == 1 || NguoiDung.IsRootSys == 1;
+            }
+        }
+        public bool IsRootSys
+        {
+            get
+            {
+                return NguoiDung.IsRootSys == 1;
             }
         }
         public bool IsAuthenticated
@@ -171,7 +179,7 @@ namespace BaseNetCoreApi.Service
                         _permissons = new List<GroupUserMenu>();
                     }
                     var permissionPath =  RequestPath.Substring(0, RequestPath.LastIndexOf("/"));
-                    _permissons = _permissionService.GetGroupUserMenuByNguoiDungByPathByTruongBySo(_nguoiDungId!.Value, permissionPath, MA_TRUONG, MA_SO_GD);
+                    _permissons = _permissionService.GetGroupUserMenuByNguoiDungByPath(_nguoiDungId!.Value, permissionPath);
                 }
                 return _permissons;
             }

@@ -1,4 +1,5 @@
 using BaseNetCoreApi.Services;
+using BaseNetCoreApi.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseNetCoreApi.Controllers
@@ -17,16 +18,14 @@ namespace BaseNetCoreApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get(int ma_nam_hoc, decimal Id )
+        public IActionResult Get(decimal Id)
         {
             try
             {
-                var ret = _nguoiDungService.GetByNguoiDungId(Id, ma_nam_hoc);
-
-
+                var ret = _nguoiDungService.GetByNguoiDungId(Id);
                 return Ok(ret);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
