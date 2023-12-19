@@ -1,5 +1,6 @@
-﻿using BaseNetCoreApi.Helper;
-using BaseNetCoreApi.Service;
+﻿using BaseNetCoreApi.DomainService;
+using BaseNetCoreApi.DomainService.Interface;
+using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Security.Claims;
 using Microsoft.Extensions.Caching.Memory;
-using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Values;
+using BaseNetCoreApi.DomainService;
+using BaseNetCoreApi.DomainService.Interface;
 
 namespace BaseNetCoreApi.Infrastructure.AttributeCollection
 {

@@ -1,20 +1,9 @@
 ﻿using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
-using BaseNetCoreApi.Infrastructure.ContextProvider;
 using BaseNetCoreApi.Infrastructure.Repository.Interface;
-using BaseNetCoreApi.Service;
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Query;
-using NPOI.Util;
-using SixLabors.ImageSharp;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace BaseNetCoreApi.Infrastructure.Repository
@@ -22,11 +11,11 @@ namespace BaseNetCoreApi.Infrastructure.Repository
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, new()
     {
         #region Contructor
-        private IUnitOfWork _unitOfWork;
-        private IQiCache _qiCache;
-        private string _cacheKeyPattern;
-        private string? _tableName;
-        private IEntityType? _entityType;
+        protected IUnitOfWork _unitOfWork;
+        protected IQiCache _qiCache;
+        protected string _cacheKeyPattern;
+        protected string? _tableName;
+        protected IEntityType? _entityType;
         public Repository(IUnitOfWork unitOfWork, IQiCache qiCache)
         {
             _unitOfWork = unitOfWork;

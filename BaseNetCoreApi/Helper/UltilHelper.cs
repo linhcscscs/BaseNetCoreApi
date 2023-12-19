@@ -3,6 +3,7 @@ using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
@@ -127,6 +128,19 @@ namespace BaseNetCoreApi.Helper
                 TotalPages = model.TotalPages,
                 Data = model.Data.Select(func).ToList(),
             };
+        }
+        public static string GetIPAddress(this IHttpContextAccessor httpContextAccessor)
+        {
+            return httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "";
+        }
+
+        public static string GetUserAgent(this IHttpContextAccessor httpContextAccessor)
+        {
+            return httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? "";
+        }
+        public static string GetURL(this IHttpContextAccessor httpContextAccessor)
+        {
+            return httpContextAccessor?.HttpContext?.Request.GetDisplayUrl().ToString() ?? "";
         }
     }
 }

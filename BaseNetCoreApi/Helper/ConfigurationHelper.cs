@@ -91,5 +91,13 @@
                 return GetConfigByName("AppSettings:CookieSecret");
             }
         }
+
+        public static string MONGODB_NAME
+        {
+            get
+            {
+                return GetConfigByName("AppSettings:MONGODB_NAME");
+            }
+        }
     }
 }

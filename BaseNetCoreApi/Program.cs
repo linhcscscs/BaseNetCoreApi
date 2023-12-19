@@ -1,14 +1,19 @@
 using BaseNetCoreApi.BackgroundTask;
+using BaseNetCoreApi.DomainService;
+using BaseNetCoreApi.DomainService.Interface;
 using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
 using BaseNetCoreApi.Infrastructure.ContextProvider;
 using BaseNetCoreApi.Infrastructure.ContextProvider.Interface;
 using BaseNetCoreApi.Infrastructure.Models.PHO_CAP_GDEntities;
+using BaseNetCoreApi.Infrastructure.MongoDBClient;
+using BaseNetCoreApi.Infrastructure.MongoDBClient.Interface;
 using BaseNetCoreApi.Infrastructure.Repository;
 using BaseNetCoreApi.Infrastructure.Repository.Interface;
 using BaseNetCoreApi.Middleware;
+using BaseNetCoreApi.Models.Collection;
+using BaseNetCoreApi.Models.Collection.Interface;
 using BaseNetCoreApi.Models.Repository;
-using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Services;
 using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
@@ -178,10 +183,12 @@ services.AddSwaggerGen(c =>
 #region policy
 #endregion
 #region DI
+#region Domain Service
+services.AddScoped<IWorkContextService, WorkContextService>();
+#endregion
 #region Service
 services.AddSingleton<IQiCache, QiCache>();
 services.AddTransient<INguoiDungService, NguoiDungService>();
-services.AddScoped<IWorkContextService, WorkContextService>();
 services.AddTransient<IPermissionService, PermissionService>();
 services.AddTransient<IAuthenticateService, AuthenticateService>();
 #endregion
@@ -196,6 +203,12 @@ services.AddScoped<IGroupUserMenuRepository, GroupUserMenuRepository>();
 services.AddScoped<IGroupUserRepository, GroupUserRepository>();
 services.AddScoped<INguoiDungRepository, NguoiDungRepository>();
 services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+#endregion
+#region Collection
+#region Base Collection
+services.AddScoped<IMongoDbClientProvider, MongoDbClientProvider>();
+#endregion
+services.AddScoped<ILogSYSCollection, LogSYSCollection>();
 #endregion
 #region Background Service
 // Hosted Service

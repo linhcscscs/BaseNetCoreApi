@@ -1,11 +1,14 @@
-﻿using BaseNetCoreApi.Helper;
+﻿using BaseNetCoreApi.DomainService;
+using BaseNetCoreApi.DomainService.Interface;
+using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
 using BaseNetCoreApi.Infrastructure.ContextProvider.Interface;
+using BaseNetCoreApi.Infrastructure.Models.MongoDb;
 using BaseNetCoreApi.Infrastructure.Repository.Interface;
+using BaseNetCoreApi.Models.Collection.Interface;
 using BaseNetCoreApi.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Models.Repository;
 using BaseNetCoreApi.Models.ViewModel;
-using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using EFCore.BulkExtensions;
@@ -28,6 +31,7 @@ namespace BaseNetCoreApi.Services
         private IHttpContextAccessor _httpContextAccessor;
         private IUnitOfWork _unitOfWork;
         private IRefreshTokenRepository _refreshTokenRepository;
+        private ILogSYSCollection _logSYSCollection;
         public AuthenticateService(
             INguoiDungService nguoiDungService,
             IQiCache qiCache,
@@ -36,7 +40,8 @@ namespace BaseNetCoreApi.Services
             IWorkContextService workContextService,
             IHttpContextAccessor httpContextAccessor,
             IUnitOfWork unitOfWork,
-            IRefreshTokenRepository refreshTokenRepository)
+            IRefreshTokenRepository refreshTokenRepository,
+            ILogSYSCollection logSYSCollection)
         {
             _nguoiDungService = nguoiDungService;
             _qiCache = qiCache;
@@ -46,6 +51,7 @@ namespace BaseNetCoreApi.Services
             _httpContextAccessor = httpContextAccessor;
             _unitOfWork = unitOfWork;
             _refreshTokenRepository = refreshTokenRepository;
+            _logSYSCollection = logSYSCollection;
         }
         private string GenerateJwtToken(NguoiDung nguoiDung)
         {
@@ -88,7 +94,7 @@ namespace BaseNetCoreApi.Services
 
             return refreshToken;
         }
-        private AuthResponse GetAuth(NguoiDung nguoiDung,string ma_tinh, string ma_huyen, string ma_xa)
+        private AuthResponse GetAuth(NguoiDung nguoiDung, string ma_tinh, string ma_huyen, string ma_xa)
         {
             var authResponse = new AuthResponse();
 
@@ -107,7 +113,8 @@ namespace BaseNetCoreApi.Services
             authResponse.IsRootSys = nguoiDung.IsRootSys == 1;
 
             // Permission
-            authResponse.Permissions = _permissionService.GetGroupUserMenuByNguoiDung(nguoiDung.Id).Select(s => new GroupUserPermission() {
+            authResponse.Permissions = _permissionService.GetGroupUserMenuByNguoiDung(nguoiDung.Id).Select(s => new GroupUserPermission()
+            {
                 URL = s.Menu.Link,
                 MenuName = s.Menu.MenuName,
                 MenuLevel = s.Menu.LevelItem,
@@ -162,7 +169,23 @@ namespace BaseNetCoreApi.Services
                 return ret;
             }
             authResponse = GetAuth(nguoiDung, model.ma_tinh, model.ma_huyen, model.ma_xa);
-
+            var httpContextAccessor = _workContextService.HttpContextAccessor;
+            _logSYSCollection.Save(new LogSYSModel()
+            {
+                _id = MongoDB.Bson.ObjectId.GenerateNewId(),
+                MA_NAM_HOC = _workContextService.MA_NAM_HOC,
+                MA_TINH = model.ma_tinh,
+                MA_HUYEN = model.ma_huyen,
+                MA_XA = model.ma_xa,
+                NGAY_TAO = DateTime.Now,
+                HANH_DONG = LogType.LOG_IN,
+                TEN_BANG = "",
+                GHI_CHU = "Đăng nhập",
+                NGUOI_TAO = model.Username,
+                IP = httpContextAccessor.GetIPAddress(),
+                URL = httpContextAccessor.GetURL(),
+                USER_AGENT = httpContextAccessor.GetUserAgent()
+            });
             return ret;
         }
         public ReturnCode RefreshAccessToken(RefreshAccessTokenRequest model, out AuthResponse authResponse)

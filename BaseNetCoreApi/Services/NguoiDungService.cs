@@ -1,10 +1,11 @@
-﻿using BaseNetCoreApi.Helper;
+﻿using BaseNetCoreApi.DomainService;
+using BaseNetCoreApi.DomainService.Interface;
+using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
 using BaseNetCoreApi.Infrastructure.ContextProvider.Interface;
 using BaseNetCoreApi.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Models.Repository;
 using BaseNetCoreApi.Models.ViewModel;
-using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Services.Interface;
 
 namespace BaseNetCoreApi.Services

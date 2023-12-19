@@ -1,7 +1,8 @@
-﻿using BaseNetCoreApi.Infrastructure.ContextProvider.Interface;
+﻿using BaseNetCoreApi.DomainService;
+using BaseNetCoreApi.DomainService.Interface;
+using BaseNetCoreApi.Infrastructure.ContextProvider.Interface;
 using BaseNetCoreApi.Infrastructure.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Infrastructure.Repository.Interface;
-using BaseNetCoreApi.Service;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 

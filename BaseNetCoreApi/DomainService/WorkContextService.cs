@@ -1,29 +1,13 @@
-﻿using BaseNetCoreApi.Helper;
+﻿using BaseNetCoreApi.DomainService.Interface;
+using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Models.Repository;
-using BaseNetCoreApi.Services;
 using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Http.Extensions;
 
-namespace BaseNetCoreApi.Service
+namespace BaseNetCoreApi.DomainService
 {
-    public interface IWorkContextService
-    {
-        public decimal NguoiDungId { get; set; }
-        public int MA_NAM_HOC { get; }
-        public NguoiDung NguoiDung { get; }
-        public string MA_TINH { get; }
-        public string MA_HUYEN { get; }
-        public string MA_XA { get; }
-        public List<GroupUserMenu> Permissons { get; }
-        public bool IsRoot { get; }
-        public bool IsRootSys { get; }
-        public bool IsAuthenticated { get; }
-        public string RequestPath { get; }
-        public string FullRequestURL { get; }
-
-    }
     public class WorkContextService : IWorkContextService
     {
         #region Contructor
@@ -152,7 +136,7 @@ namespace BaseNetCoreApi.Service
         {
             get
             {
-                return _httpContextAccessor?.HttpContext?.Request.GetDisplayUrl() ?? "" ;
+                return _httpContextAccessor?.HttpContext?.Request.GetDisplayUrl() ?? "";
             }
         }
         public string RequestPath
@@ -178,11 +162,12 @@ namespace BaseNetCoreApi.Service
                     {
                         _permissons = new List<GroupUserMenu>();
                     }
-                    var permissionPath =  RequestPath.Substring(0, RequestPath.LastIndexOf("/"));
+                    var permissionPath = RequestPath.Substring(0, RequestPath.LastIndexOf("/"));
                     _permissons = _permissionService.GetGroupUserMenuByNguoiDungByPath(_nguoiDungId!.Value, permissionPath);
                 }
                 return _permissons;
             }
         }
+        public IHttpContextAccessor HttpContextAccessor => _httpContextAccessor;
     }
 }

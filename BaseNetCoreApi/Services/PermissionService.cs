@@ -1,9 +1,10 @@
-﻿using BaseNetCoreApi.Infrastructure.CacheProvider;
+﻿using BaseNetCoreApi.DomainService;
+using BaseNetCoreApi.DomainService.Interface;
+using BaseNetCoreApi.Infrastructure.CacheProvider;
 using BaseNetCoreApi.Infrastructure.CacheProvider.CacheKey;
 using BaseNetCoreApi.Infrastructure.ContextProvider.Interface;
 using BaseNetCoreApi.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Models.Repository;
-using BaseNetCoreApi.Service;
 using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 
