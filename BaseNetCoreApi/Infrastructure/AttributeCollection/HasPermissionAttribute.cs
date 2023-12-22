@@ -31,7 +31,7 @@ namespace BaseNetCoreApi.Infrastructure.AttributeCollection
 
             if (!workcontext.IsAuthenticated)
             {
-                context.Result = UltilHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Unauthorized));
+                context.Result = ReturnHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Unauthorized));
                 return;
             }
             var permissons = workcontext.Permissons;
@@ -66,7 +66,7 @@ namespace BaseNetCoreApi.Infrastructure.AttributeCollection
             }
             if (!hasPermission)
             {
-                context.Result = UltilHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Forbidden));
+                context.Result = ReturnHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Forbidden));
             }
         }
     }

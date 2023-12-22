@@ -17,7 +17,6 @@ namespace BaseNetCoreApi.Models.Dtos
     }
     public class PaginationResponse<T>
     {
-
         public PaginationResponse()
         {
         }
@@ -25,7 +24,9 @@ namespace BaseNetCoreApi.Models.Dtos
         {
             PageIndex = model.PageIndex > 0 ? model.PageIndex.Value : 1;
             TotalItems = model.Queryable.Count();
-            if (model.PageSize == null || model.PageSize > ConfigurationHelper.MaxPageSize)
+            if (model.PageSize == null ||
+                model.PageSize <= 0 || 
+                model.PageSize > ConfigurationHelper.MaxPageSize)
             {
                 PageSize = ConfigurationHelper.MaxPageSize;
             }

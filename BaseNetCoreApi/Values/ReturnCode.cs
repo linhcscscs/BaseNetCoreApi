@@ -6,24 +6,52 @@ namespace BaseNetCoreApi.Values
 {
     public class ReturnCode
     {
-        private EReturnCode? _returnCode;
+        private EReturnCode? _eReturnCode;
+        private string _errorCode;
+        private string _errorMsg;
         public ReturnCode(EReturnCode returnCode)
         {
-            _returnCode = returnCode;
+            _eReturnCode = returnCode;
         }
         public ReturnCode() { }
-        public EReturnCode returnCode
+        public EReturnCode? EReturnCode
         {
             set
             {
-                _returnCode = value;
+                _eReturnCode = value;
             }
         }
 
-        public bool Success { get { return _returnCode == null; } }
-        public string ErrorCode { get { return _returnCode?.GetMa() ?? ""; } }
-        public string ErrorMsg { get { return _returnCode?.GetDescription() ?? ""; } }
-        public int StatusCode() => _returnCode?.GetStatusCode() ?? 500;
+        public bool Success
+        {
+            get
+            {
+                return _eReturnCode == null && string.IsNullOrEmpty(ErrorCode) && string.IsNullOrEmpty(ErrorMsg);
+            }
+        }
+        public string ErrorCode
+        {
+            get
+            {
+                return _eReturnCode?.GetMa() ?? _errorCode ?? "";
+            }
+            set
+            {
+                _errorCode ??= value;
+            }
+        }
+        public string ErrorMsg
+        {
+            get
+            {
+                return _eReturnCode?.GetDescription() ?? _errorMsg ?? "";
+            }
+            set
+            {
+                _errorMsg ??= value;
+            }
+        }
+        public int StatusCode() => _eReturnCode?.GetStatusCode() ?? 500;
     }
     public enum EReturnCode
     {

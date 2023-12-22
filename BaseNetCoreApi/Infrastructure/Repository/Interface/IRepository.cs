@@ -10,6 +10,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository.Interface
         TEntity? FirstOrDefault();
         TEntity? FirstOrDefault(Func<TEntity, bool> predicate);
         TEntity? GetByMa(string Ma);
+        List<TEntity>? GetAll(bool orderByThuTu = false);
         List<TEntity>? GetByListMa(List<string> listMa);
         TEntity? GetById(decimal Id);
         List<TEntity>? GetByListId(List<decimal> listId);

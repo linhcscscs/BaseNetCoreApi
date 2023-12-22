@@ -57,6 +57,7 @@ namespace BaseNetCoreApi.BackgroundTask
                     ClearRefreshToken();
                     break;
                 case EHostedServiceTask.ClearTempFile:
+                    ClearTempFile();
                     break;
                 default:
                     break;

@@ -11,6 +11,7 @@ using BaseNetCoreApi.Infrastructure.MongoDBClient.Interface;
 using BaseNetCoreApi.Infrastructure.Repository;
 using BaseNetCoreApi.Infrastructure.Repository.Interface;
 using BaseNetCoreApi.Middleware;
+using BaseNetCoreApi.Models.AutoMapperProfile;
 using BaseNetCoreApi.Models.Collection;
 using BaseNetCoreApi.Models.Collection.Interface;
 using BaseNetCoreApi.Models.Repository;
@@ -203,6 +204,10 @@ services.AddScoped<IGroupUserMenuRepository, GroupUserMenuRepository>();
 services.AddScoped<IGroupUserRepository, GroupUserRepository>();
 services.AddScoped<INguoiDungRepository, NguoiDungRepository>();
 services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+services.AddScoped<IDmCapHocRepository, DmCapHocRepository>();
+services.AddScoped<IDmTinhRepository, DmTinhRepository>();
+services.AddScoped<IDmHuyenRepository, DmHuyenRepository>();
+services.AddScoped<IDmXaRepository, DmXaRepository>();
 #endregion
 #region Collection
 #region Base Collection

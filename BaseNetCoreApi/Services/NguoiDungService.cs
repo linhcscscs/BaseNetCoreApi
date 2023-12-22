@@ -12,20 +12,11 @@ namespace BaseNetCoreApi.Services
 {
     public class NguoiDungService : INguoiDungService
     {
-        private IPhoCapGDContextProvider _contextProvider;
-        private IQiCache _qiCache;
-        private IWorkContextService _workContextService;
         private INguoiDungRepository _nguoiDungRepository;
         public NguoiDungService(
-            IPhoCapGDContextProvider contextProvider,
-            IQiCache qiCache,
-            IWorkContextService workContextService,
             INguoiDungRepository nguoiDungRepository
             )
         {
-            _contextProvider = contextProvider;
-            _qiCache = qiCache;
-            _workContextService = workContextService;
             _nguoiDungRepository = nguoiDungRepository;
         }
         public NguoiDung? GetByNguoiDungId(decimal id)

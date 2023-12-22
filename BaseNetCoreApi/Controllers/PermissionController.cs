@@ -26,7 +26,7 @@ namespace BaseNetCoreApi.Controllers
         [HttpGet("GetAllTest/Baocao123")]
         public IActionResult GetAll()
         {
-            return UltilHelper.ReturnSuccess(_nguoiDungService.GetByNguoiDungId(1));
+            return ReturnHelper.ReturnSuccess(_nguoiDungService.GetByNguoiDungId(1));
         }
     }
 }

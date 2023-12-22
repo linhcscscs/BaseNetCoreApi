@@ -36,17 +36,17 @@ namespace BaseNetCoreApi.Controllers
                 var ret = _authenticateService.Login(model, out var authResponse);
                 if (ret.Success)
                 {
-                    return UltilHelper.ReturnSuccess(authResponse);
+                    return ReturnHelper.ReturnSuccess(authResponse);
                 }
                 else
                 {
-                    return UltilHelper.ReturnErrorStatusCode(ret);
+                    return ReturnHelper.ReturnErrorStatusCode(ret);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("AuthenticateController.Login", ex);
-                return UltilHelper.ExceptionErrorStatus500;
+                return ReturnHelper.ExceptionErrorStatus500;
             }
         }
 
@@ -60,17 +60,17 @@ namespace BaseNetCoreApi.Controllers
                 var ret = _authenticateService.RefreshAccessToken(model, out var authResponse);
                 if (ret.Success)
                 {
-                    return UltilHelper.ReturnSuccess(authResponse);
+                    return ReturnHelper.ReturnSuccess(authResponse);
                 }
                 else
                 {
-                    return UltilHelper.ReturnErrorStatusCode(ret);
+                    return ReturnHelper.ReturnErrorStatusCode(ret);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("AuthenticateController.RefreshToken", ex);
-                return UltilHelper.ExceptionErrorStatus500;
+                return ReturnHelper.ExceptionErrorStatus500;
             }
         }
 
@@ -81,12 +81,12 @@ namespace BaseNetCoreApi.Controllers
             try
             {
                 _authenticateService.Logout(model);
-                return UltilHelper.ReturnSuccess();
+                return ReturnHelper.ReturnSuccess();
             }
             catch (Exception ex)
             {
                 _logger.LogError("AuthenticateController.Logout", ex);
-                return UltilHelper.ExceptionErrorStatus500;
+                return ReturnHelper.ExceptionErrorStatus500;
             }
         }
 

@@ -30,7 +30,7 @@ namespace BaseNetCoreApi.Infrastructure.AttributeCollection
             var workcontext = context.HttpContext.RequestServices.GetService<IWorkContextService>();
             if (!workcontext.IsAuthenticated)
             {
-                context.Result = UltilHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Unauthorized));
+                context.Result = ReturnHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Unauthorized));
                 return;
             }
             if (workcontext.IsRoot)
@@ -44,7 +44,7 @@ namespace BaseNetCoreApi.Infrastructure.AttributeCollection
 
             if (!hasPermission)
             {
-                context.Result = UltilHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Forbidden));
+                context.Result = ReturnHelper.ReturnErrorStatusCode(new ReturnCode(EReturnCode.Forbidden));
             }
         }
     }

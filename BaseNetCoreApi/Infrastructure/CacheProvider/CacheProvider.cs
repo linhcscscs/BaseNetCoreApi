@@ -17,7 +17,7 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
         void RemoveByFirstName(string key);
         string BuildCachedKey(params object[] objects); public T GetByKey<T>(Func<T> getDataSource,
            string key,
-           double cacheTime = CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES,
+           double cacheTime = CachingTime.CACHING_TIME_DEFAULT_IN_1_MINUTES,
            bool isDeepClone = true)
            where T : new();
         void Remove(string cacheKey);
@@ -106,13 +106,13 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
             cacheKeys = Cache.Select(kvp => kvp.Key).ToList();
             return cacheKeys;
         }
-        public T GetByKey<T>(Func<T> getDataSource,
+        public T? GetByKey<T>(Func<T> getDataSource,
            string key,
            double cacheTime = CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES,
            bool isDeepClone = true)
            where T : new()
         {
-            T result = new T();
+            T? result = new T();
             if (!IsSet(key))
             {
                 result = getDataSource.Invoke() ?? new T();

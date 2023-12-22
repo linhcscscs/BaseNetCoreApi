@@ -33,7 +33,7 @@ namespace BaseNetCoreApi.Infrastructure.ContextProvider
         public TContext GetWrite(int ma_nam_hoc, string ma_cap_hoc = "")
         {
             TContext writeContext;
-            if (!_listReadContext.TryGetValue((ma_nam_hoc, ma_cap_hoc), out writeContext!))
+            if (!_listWriteContext.TryGetValue((ma_nam_hoc, ma_cap_hoc), out writeContext!))
             {
                 writeContext = GetContext(ma_nam_hoc, true, ma_cap_hoc);
                 _listWriteContext.Add((ma_nam_hoc, ma_cap_hoc), writeContext);

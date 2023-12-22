@@ -5,6 +5,7 @@ using BaseNetCoreApi.Infrastructure.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Infrastructure.Repository.Interface;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace BaseNetCoreApi.Infrastructure.Repository
 {
@@ -47,6 +48,12 @@ namespace BaseNetCoreApi.Infrastructure.Repository
             var context = isWrite ? WriteContext : ReadContext;
             return context.Database.SqlQuery<T>(sqlQuery);
         }
+        public IQueryable<T> SqlQuery<T>(string sqlQuery, bool isWrite = false)
+        {
+            var context = isWrite ? WriteContext : ReadContext;
+            return context.Database.SqlQueryRaw<T>(sqlQuery);
+        }
+
 
         public void SaveChange()
         {

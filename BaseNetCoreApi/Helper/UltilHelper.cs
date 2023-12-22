@@ -24,30 +24,8 @@ namespace BaseNetCoreApi.Helper
         public static string ListToStringQuery<T>(List<T> lst)
         {
             var listString = lst.Select(x => $"'{x}'").ToList();
-            var lstQuery = string.Join(",", listString.ToArray());
+            var lstQuery = string.Join(",", listString);
             return lstQuery;
-        }
-        public static IActionResult ReturnSuccess(object? responseData = null)
-        {
-            return new OkObjectResult(new ResponseModel(responseData));
-        }
-
-        public static IActionResult ExceptionErrorStatus500
-        {
-            get
-            {
-                return ReturnErrorStatusCode(new ReturnCode(EReturnCode.InternalErrorException));
-            }
-        }
-
-        public static IActionResult ReturnErrorStatusCode(ReturnCode ret)
-        {
-            var model = new ResponseModel(ret);
-            var result = new ObjectResult(model)
-            {
-                StatusCode = ret.StatusCode()
-            };
-            return result;
         }
         public static byte[] StreamToByteArray(string fileName)
         {
@@ -74,14 +52,6 @@ namespace BaseNetCoreApi.Helper
             {
                 return null;
             }
-        }
-        public static IActionResult ReturnFile(this ControllerBase controllerBase, string filePath, string fileName)
-        {
-            if (System.IO.File.Exists(filePath))
-            {
-                return controllerBase.File(System.IO.File.OpenRead(filePath), "application/octet-stream", fileName);
-            }
-            return controllerBase.NotFound();
         }
         public static ReturnCode SaveTempExcelStaticFile(IFormFile file, out string filePath)
         {

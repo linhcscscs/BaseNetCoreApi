@@ -20,7 +20,7 @@ namespace BaseNetCoreApi.Controllers
             }
             else
             {
-                return UltilHelper.ReturnErrorStatusCode(ret);
+                return ReturnHelper.ReturnErrorStatusCode(ret);
             }
         }
         public class TestUpload

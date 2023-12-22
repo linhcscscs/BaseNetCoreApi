@@ -4,6 +4,7 @@ using BaseNetCoreApi.Infrastructure.Repository.Interface;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace BaseNetCoreApi.Infrastructure.Repository
@@ -28,11 +29,11 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         }
         #endregion
         #region Method
-        private DbSet<TEntity> _dbSetRead
+        protected DbSet<TEntity> _dbSetRead
         {
             get => _unitOfWork.ReadContext.Set<TEntity>();
         }
-        private DbSet<TEntity> _dbSetWrite
+        protected DbSet<TEntity> _dbSetWrite
         {
             get => _unitOfWork.WriteContext.Set<TEntity>();
         }
@@ -72,6 +73,30 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                     return result;
                 },
                 key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetByMa", Ma)
+                );
+        }
+        public virtual List<TEntity>? GetAll(bool orderByThuTu = false)
+        {
+            return _qiCache.GetByKey(
+                getDataSource: () =>
+                {
+                    if (!orderByThuTu)
+                    {
+                        return _dbSetRead.ToList();
+                    }
+                    else
+                    {
+                        List<TEntity>? result = null;
+                        if (_tableName == null)
+                        {
+                            return result;
+                        }
+                        string sql = $"SELECT * FROM {_tableName} ORDER BY THU_TU";
+                        result = _dbSetRead.FromSqlRaw(sql).ToList();
+                        return result;
+                    }
+                },
+                key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetAll", orderByThuTu)
                 );
         }
         public virtual List<TEntity>? GetByListMa(List<string> listMa)
@@ -129,9 +154,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         }
         public virtual List<TEntity> GetMulti(Func<TEntity, bool> predicate)
         {
-            List<TEntity> result = new List<TEntity>();
-            result = _dbSetRead.Where(predicate).ToList();
-            return result;
+            return _dbSetRead.Where(predicate).ToList();
         }
         public virtual void InsertOrUpdate(TEntity entitiy, BulkConfig? bulkConfig = null)
         {
