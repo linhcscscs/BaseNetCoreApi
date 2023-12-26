@@ -32,6 +32,7 @@ namespace BaseNetCoreApi.Services
         private IUnitOfWork _unitOfWork;
         private IRefreshTokenRepository _refreshTokenRepository;
         private ILogSYSCollection _logSYSCollection;
+        private INguoiDungRepository _nguoiDungRepository;
         public AuthenticateService(
             INguoiDungService nguoiDungService,
             IQiCache qiCache,
@@ -41,7 +42,8 @@ namespace BaseNetCoreApi.Services
             IHttpContextAccessor httpContextAccessor,
             IUnitOfWork unitOfWork,
             IRefreshTokenRepository refreshTokenRepository,
-            ILogSYSCollection logSYSCollection)
+            ILogSYSCollection logSYSCollection,
+            INguoiDungRepository nguoiDungRepository)
         {
             _nguoiDungService = nguoiDungService;
             _qiCache = qiCache;
@@ -52,14 +54,18 @@ namespace BaseNetCoreApi.Services
             _unitOfWork = unitOfWork;
             _refreshTokenRepository = refreshTokenRepository;
             _logSYSCollection = logSYSCollection;
+            _nguoiDungRepository = nguoiDungRepository;
         }
-        private string GenerateJwtToken(NguoiDung nguoiDung)
+        private string GenerateJwtToken(NguoiDung nguoiDung, string ma_tinh, string ma_huyen, string ma_xa)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(JWTSettings.Secret);
             var claims = new ClaimsIdentity(
                 new[] {
                     new Claim(UserClaimKey.NguoiDungId, nguoiDung.Id.ToString()),
+                    new Claim(UserClaimKey.MA_HUYEN, ma_huyen),
+                    new Claim(UserClaimKey.MA_TINH, ma_tinh),
+                    new Claim(UserClaimKey.MA_XA, ma_xa),
                 });
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -73,25 +79,24 @@ namespace BaseNetCoreApi.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        private string GenerateRefreshToken(NguoiDung nguoiDung)
+        private string GenerateRefreshToken(NguoiDung nguoiDung, string ma_tinh, string ma_huyen, string ma_xa)
         {
             var randomNumber = new byte[64];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             var refreshToken = Convert.ToBase64String(randomNumber);
-            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
+            var rftModel = new RefreshToken()
             {
-                var rftModel = new RefreshToken()
-                {
-                    ExpDate = DateTime.Now.AddDays(JWTSettings.RefreshTokenValidityInDays),
-                    Active = true,
-                    NguoiDungId = nguoiDung.Id,
-                    Token = refreshToken,
-                };
-                _refreshTokenRepository.InsertOrUpdate(rftModel);
-                context.SaveChanges();
-            }
-
+                ExpDate = DateTime.Now.AddDays(JWTSettings.RefreshTokenValidityInDays),
+                Active = true,
+                NguoiDungId = nguoiDung.Id,
+                Token = refreshToken,
+                MaTinh = ma_tinh,
+                MaHuyen = ma_huyen,
+                MaXa = ma_xa
+            };
+            _refreshTokenRepository.InsertOrUpdate(rftModel);
+            _unitOfWork.SaveChanges();
             return refreshToken;
         }
         private AuthResponse GetAuth(NguoiDung nguoiDung, string ma_tinh, string ma_huyen, string ma_xa)
@@ -101,12 +106,17 @@ namespace BaseNetCoreApi.Services
             authResponse.NguoiDungId = nguoiDung.Id;
 
             // Get JWT token
-            var accessToken = GenerateJwtToken(nguoiDung);
+            var accessToken = GenerateJwtToken(nguoiDung, ma_tinh, ma_huyen, ma_xa);
             authResponse.AccessToken = accessToken;
 
             // Rf Token
-            var refreshToken = GenerateRefreshToken(nguoiDung);
+            var refreshToken = GenerateRefreshToken(nguoiDung, ma_tinh, ma_huyen, ma_xa);
             authResponse.RefreshToken = refreshToken;
+
+            // Ma
+            authResponse.MaTinh = ma_tinh;
+            authResponse.MaHuyen = ma_huyen;
+            authResponse.MaXa = ma_xa;
 
             // IsRoot
             authResponse.IsRoot = nguoiDung.IsRoot == 1;
@@ -142,21 +152,18 @@ namespace BaseNetCoreApi.Services
             }).ToList();
 
             // Cookie 
-            _httpContextAccessor.setCookie(UserCookieKey.MA_HUYEN, ma_tinh);
-            _httpContextAccessor.setCookie(UserCookieKey.MA_TINH, ma_huyen);
-            _httpContextAccessor.setCookie(UserCookieKey.MA_XA, ma_xa);
+            //_httpContextAccessor.setCookie(UserCookieKey.MA_HUYEN, ma_tinh);
+            //_httpContextAccessor.setCookie(UserCookieKey.MA_TINH, ma_huyen);
+            //_httpContextAccessor.setCookie(UserCookieKey.MA_XA, ma_xa);
 
             return authResponse;
         }
         public void ForceReLogin(List<decimal> nguoiDungIds)
         {
             // Refresh Token
-            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
-            {
-                var rmvLst = context.RefreshTokens.Where(q => nguoiDungIds.Contains(q.NguoiDungId)).ToArray();
-                context.BulkDelete<RefreshToken>(rmvLst);
-                context.SaveChanges();
-            }
+            var rmvLst = _refreshTokenRepository.GetMulti(q => nguoiDungIds.Contains(q.NguoiDungId)).ToList();
+            _refreshTokenRepository.Remove(rmvLst);
+            _unitOfWork.SaveChanges();
         }
         public ReturnCode Login(LoginRequest model, out AuthResponse authResponse)
         {
@@ -192,58 +199,49 @@ namespace BaseNetCoreApi.Services
         {
             var ret = new ReturnCode();
             authResponse = new AuthResponse();
-            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
+            var rftModel = _refreshTokenRepository.FirstOrDefault(q => q.NguoiDungId == model.NguoiDungId && q.Token == model.RefreshToken && q.ExpDate >= DateTime.Now);
+            if (rftModel == null)
             {
-                var rftModel = context.RefreshTokens.FirstOrDefault(q => q.NguoiDungId == model.NguoiDungId && q.Token == model.RefreshToken && q.ExpDate >= DateTime.Now);
-                if (rftModel == null)
-                {
-                    ret = new ReturnCode(EReturnCode.TokenInvalid);
-                    return ret;
-                }
-                if (rftModel.Active == false)
-                {
-                    ForceReLogin(new List<decimal>() { _workContextService.NguoiDungId });
-                    ret = new ReturnCode(EReturnCode.TokenInvalid);
-                    return ret;
-                }
-
-                var nguoiDung = context.NguoiDungs.FirstOrDefault(q => q.Id == model.NguoiDungId);
-                if (nguoiDung == null)
-                {
-                    ret = new ReturnCode(EReturnCode.TokenInvalid);
-                    return ret;
-                }
-
-                // Refresh Token
-                rftModel.Active = false;
-                context.RefreshTokens.Update(rftModel);
-                context.SaveChanges();
-
-                authResponse = GetAuth(nguoiDung, model.ma_tinh, model.ma_huyen, model.ma_xa);
+                ret = new ReturnCode(EReturnCode.TokenInvalid);
+                return ret;
             }
+            if (rftModel.Active == false)
+            {
+                ForceReLogin(new List<decimal>() { _workContextService.NguoiDungId });
+                ret = new ReturnCode(EReturnCode.TokenInvalid);
+                return ret;
+            }
+
+            var nguoiDung = _nguoiDungRepository.FirstOrDefault(q => q.Id == model.NguoiDungId);
+            if (nguoiDung == null)
+            {
+                ret = new ReturnCode(EReturnCode.TokenInvalid);
+                return ret;
+            }
+
+            // Refresh Token
+            rftModel.Active = false;
+            _refreshTokenRepository.InsertOrUpdate(rftModel);
+            _unitOfWork.SaveChanges();
+
+            authResponse = GetAuth(nguoiDung, rftModel.MaTinh, rftModel.MaHuyen, rftModel.MaXa);
             return ret;
         }
         public void Logout(LogoutRequest model)
         {
-            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
+            var rftModel = _refreshTokenRepository.FirstOrDefault(q => q.NguoiDungId == _workContextService.NguoiDungId && q.Token == model.RefreshToken);
+            if (rftModel != null)
             {
-                var rftModel = context.RefreshTokens.FirstOrDefault(q => q.NguoiDungId == _workContextService.NguoiDungId && q.Token == model.RefreshToken);
-                if (rftModel != null)
-                {
-                    rftModel.Active = false;
-                    context.RefreshTokens.Update(rftModel);
-                    context.SaveChanges();
-                }
+                rftModel.Active = false;
+                _refreshTokenRepository.InsertOrUpdate(rftModel);
+                _unitOfWork.SaveChanges();
             }
         }
         public void ClearRefreshToken()
         {
-            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, true))
-            {
-                var lstRft = context.RefreshTokens.Where(q => q.ExpDate <= DateTime.Now).ToList();
-                context.BulkDelete(lstRft);
-                context.SaveChanges();
-            }
+            var lstRft = _refreshTokenRepository.GetMulti(q => q.ExpDate <= DateTime.Now).ToList();
+            _refreshTokenRepository.Remove(lstRft);
+            _unitOfWork.SaveChanges();
         }
     }
 }

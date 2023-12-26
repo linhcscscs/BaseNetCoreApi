@@ -31,7 +31,7 @@ public partial class HocSinh
 
     public string HoTen { get; set; } = null!;
 
-    public DateTime NgaySinh { get; set; }
+    public DateOnly NgaySinh { get; set; }
 
     public string MaGioiTinh { get; set; } = null!;
 
@@ -141,7 +141,7 @@ public partial class HocSinh
 
     public string MaTrangThaiHienTai { get; set; } = null!;
 
-    public DateTime? NgayTrangThai { get; set; }
+    public DateOnly? NgayTrangThai { get; set; }
 
     public int? IsDangHocK1 { get; set; }
 

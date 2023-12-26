@@ -11,9 +11,9 @@ public partial class DmNhomTuoiMn
 
     public string? Ten { get; set; }
 
-    public DateTime? NgayTao { get; set; }
+    public DateOnly? NgayTao { get; set; }
 
-    public DateTime? NgaySua { get; set; }
+    public DateOnly? NgaySua { get; set; }
 
     public decimal? NguoiTao { get; set; }
 

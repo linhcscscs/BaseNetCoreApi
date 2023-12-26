@@ -25,7 +25,7 @@ public partial class PhieuDieuTraTraiTuyen
 
     public string Ten { get; set; } = null!;
 
-    public DateTime NgaySinh { get; set; }
+    public DateOnly NgaySinh { get; set; }
 
     public string MaGioiTinh { get; set; } = null!;
 

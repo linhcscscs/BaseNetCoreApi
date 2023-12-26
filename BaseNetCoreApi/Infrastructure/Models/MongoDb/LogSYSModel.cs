@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace BaseNetCoreApi.Infrastructure.Models.MongoDb
 {
-    public class LogSYSModel
+    public class LogSYSModel : MongoBaseClass
     {
         /// <summary>
         /// Mã năm học
@@ -28,10 +28,6 @@ namespace BaseNetCoreApi.Infrastructure.Models.MongoDb
         [Required]
         public string MA_XA { get; set; }
 
-        [BsonId]
-        [BsonIgnoreIfDefault]
-        [IgnoreDataMember]
-        public ObjectId _id { get; set; }
         [Required]
         public string TEN_BANG { get; set; }
         [Required]

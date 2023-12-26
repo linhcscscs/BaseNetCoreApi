@@ -16,13 +16,13 @@ namespace BaseNetCoreApi.Infrastructure.Repository.Interface
         List<TEntity>? GetByListMa(List<string> listMa);
         TEntity? GetById(decimal Id);
         List<TEntity>? GetByListId(List<decimal> listId);
-        List<TEntity> GetMulti(Func<TEntity, bool> predicate);
+        IEnumerable<TEntity> GetMulti(Func<TEntity, bool> predicate);
         IQueryable<TEntity> Table { get; }
         void ClearCache();
         void InsertOrUpdate(TEntity entitiy, Action<BulkOperation<TEntity>>? options = null);
         void InsertOrUpdate(List<TEntity> entities, Action<BulkOperation<TEntity>>? options = null);
-        void Remove(TEntity entity, BulkConfig? bulkConfig = null);
-        void Remove(List<TEntity> entities, BulkConfig? bulkConfig = null);
+        void Remove(TEntity entity, Action<BulkOperation<TEntity>>? options = null);
+        void Remove(List<TEntity> entities, Action<BulkOperation<TEntity>>? options = null);
         IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includes);
     }
 }

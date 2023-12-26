@@ -15,5 +15,11 @@ public partial class RefreshToken
 
     public bool Active { get; set; }
 
+    public string MaTinh { get; set; } = null!;
+
+    public string MaHuyen { get; set; } = null!;
+
+    public string MaXa { get; set; } = null!;
+
     public virtual NguoiDung NguoiDung { get; set; } = null!;
 }

@@ -10,7 +10,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository.Interface
         int NamHoc { get; }
         PHO_CAP_GDEntities ReadContext { get; }
         PHO_CAP_GDEntities WriteContext { get; }
-        void SaveChange();
+        void SaveChanges();
         void BulkSaveChanges(BulkConfig bulkConfig);
         IQueryable<T> SqlQuery<T>(FormattableString sqlQuery, bool isWrite = false);
         IQueryable<T> SqlQuery<T>(string sqlQuery, bool isWrite = false);

@@ -24,6 +24,9 @@ namespace BaseNetCoreApi.Middleware
             {
                 workContext.NguoiDungId = NguoiDungId;
             };
+            workContext.MA_TINH = AuthHelper.GetByClaim(user, UserClaimKey.MA_TINH);
+            workContext.MA_HUYEN = AuthHelper.GetByClaim(user, UserClaimKey.MA_HUYEN);
+            workContext.MA_XA = AuthHelper.GetByClaim(user, UserClaimKey.MA_XA);
         nextSection:
             await _next(httpContext);
         }

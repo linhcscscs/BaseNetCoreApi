@@ -213,7 +213,7 @@ public partial class PHO_CAP_GDEntities : DbContext
     public virtual DbSet<XemThongBao> XemThongBaos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=42.112.27.32,21433;initial catalog=PHO_CAP_GD;user id=sa;password=QIG@104;MultipleActiveResultSets=True;App=EntityFramework;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -5159,12 +5159,8 @@ public partial class PHO_CAP_GDEntities : DbContext
             entity.Property(e => e.MaSource)
                 .HasMaxLength(20)
                 .HasColumnName("MA_SOURCE");
-            entity.Property(e => e.NgaySua)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_SUA");
-            entity.Property(e => e.NgayTao)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_TAO");
+            entity.Property(e => e.NgaySua).HasColumnName("NGAY_SUA");
+            entity.Property(e => e.NgayTao).HasColumnName("NGAY_TAO");
             entity.Property(e => e.NguoiSua)
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("NGUOI_SUA");
@@ -5766,18 +5762,14 @@ public partial class PHO_CAP_GDEntities : DbContext
             entity.Property(e => e.NamSinhCha).HasColumnName("NAM_SINH_CHA");
             entity.Property(e => e.NamSinhMe).HasColumnName("NAM_SINH_ME");
             entity.Property(e => e.NamSinhNguoiDoDau).HasColumnName("NAM_SINH_NGUOI_DO_DAU");
-            entity.Property(e => e.NgaySinh)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_SINH");
+            entity.Property(e => e.NgaySinh).HasColumnName("NGAY_SINH");
             entity.Property(e => e.NgaySua)
                 .HasColumnType("datetime")
                 .HasColumnName("NGAY_SUA");
             entity.Property(e => e.NgayTao)
                 .HasColumnType("datetime")
                 .HasColumnName("NGAY_TAO");
-            entity.Property(e => e.NgayTrangThai)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_TRANG_THAI");
+            entity.Property(e => e.NgayTrangThai).HasColumnName("NGAY_TRANG_THAI");
             entity.Property(e => e.NgheNghiepCha)
                 .HasMaxLength(250)
                 .HasColumnName("NGHE_NGHIEP_CHA");
@@ -6198,12 +6190,8 @@ public partial class PHO_CAP_GDEntities : DbContext
             entity.Property(e => e.MaXa)
                 .HasMaxLength(20)
                 .HasColumnName("MA_XA");
-            entity.Property(e => e.NgayCap)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_CAP");
-            entity.Property(e => e.NgaySinh)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_SINH");
+            entity.Property(e => e.NgayCap).HasColumnName("NGAY_CAP");
+            entity.Property(e => e.NgaySinh).HasColumnName("NGAY_SINH");
             entity.Property(e => e.NgaySua)
                 .HasColumnType("datetime")
                 .HasColumnName("NGAY_SUA");
@@ -6514,18 +6502,14 @@ public partial class PHO_CAP_GDEntities : DbContext
             entity.Property(e => e.NamTotNghiepPhoThong)
                 .HasMaxLength(50)
                 .HasColumnName("NAM_TOT_NGHIEP_PHO_THONG");
-            entity.Property(e => e.NgaySinh)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_SINH");
+            entity.Property(e => e.NgaySinh).HasColumnName("NGAY_SINH");
             entity.Property(e => e.NgaySua)
                 .HasColumnType("datetime")
                 .HasColumnName("NGAY_SUA");
             entity.Property(e => e.NgayTao)
                 .HasColumnType("datetime")
                 .HasColumnName("NGAY_TAO");
-            entity.Property(e => e.NgayTrangThai)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_TRANG_THAI");
+            entity.Property(e => e.NgayTrangThai).HasColumnName("NGAY_TRANG_THAI");
             entity.Property(e => e.NguoiSua)
                 .HasMaxLength(150)
                 .HasColumnName("NGUOI_SUA");
@@ -6662,9 +6646,7 @@ public partial class PHO_CAP_GDEntities : DbContext
             entity.Property(e => e.NamTotNghiepPhoThong)
                 .HasMaxLength(50)
                 .HasColumnName("NAM_TOT_NGHIEP_PHO_THONG");
-            entity.Property(e => e.NgaySinh)
-                .HasColumnType("date")
-                .HasColumnName("NGAY_SINH");
+            entity.Property(e => e.NgaySinh).HasColumnName("NGAY_SINH");
             entity.Property(e => e.NgaySua)
                 .HasColumnType("datetime")
                 .HasColumnName("NGAY_SUA");
@@ -6862,6 +6844,15 @@ public partial class PHO_CAP_GDEntities : DbContext
                 .ValueGeneratedOnAdd()
                 .HasColumnType("numeric(18, 0)");
             entity.Property(e => e.ExpDate).HasColumnType("datetime");
+            entity.Property(e => e.MaHuyen)
+                .HasMaxLength(50)
+                .HasColumnName("MA_HUYEN");
+            entity.Property(e => e.MaTinh)
+                .HasMaxLength(50)
+                .HasColumnName("MA_TINH");
+            entity.Property(e => e.MaXa)
+                .HasMaxLength(50)
+                .HasColumnName("MA_XA");
             entity.Property(e => e.NguoiDungId).HasColumnType("numeric(18, 0)");
 
             entity.HasOne(d => d.NguoiDung).WithMany(p => p.RefreshTokens)

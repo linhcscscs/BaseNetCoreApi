@@ -11,7 +11,7 @@ public partial class NhanSu
 
     public string? Ma { get; set; }
 
-    public DateTime? NgaySinh { get; set; }
+    public DateOnly? NgaySinh { get; set; }
 
     public string? NoiSinh { get; set; }
 
@@ -45,7 +45,7 @@ public partial class NhanSu
 
     public string? NoiCap { get; set; }
 
-    public DateTime? NgayCap { get; set; }
+    public DateOnly? NgayCap { get; set; }
 
     public string? UrlAnhDaiDien { get; set; }
 

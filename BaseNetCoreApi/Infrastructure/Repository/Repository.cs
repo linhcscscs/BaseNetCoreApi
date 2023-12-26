@@ -155,9 +155,9 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                     key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetByListId", listId)
                     );
         }
-        public virtual List<TEntity> GetMulti(Func<TEntity, bool> predicate)
+        public virtual IEnumerable<TEntity> GetMulti(Func<TEntity, bool> predicate)
         {
-            return _dbSetRead.Where(predicate).ToList();
+            return _dbSetRead.Where(predicate);
         }
         public virtual void InsertOrUpdate(TEntity entitiy, Action<BulkOperation<TEntity>>? options = null)
         {
@@ -167,13 +167,13 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         {
             _unitOfWork.WriteContext.BulkMerge(entities, options);
         }
-        public virtual void Remove(TEntity entity, BulkConfig? bulkConfig = null)
+        public virtual void Remove(TEntity entity, Action<BulkOperation<TEntity>>? options = null)
         {
-            Remove(new List<TEntity>() { entity }, bulkConfig);
+            Remove(new List<TEntity>() { entity }, options);
         }
-        public virtual void Remove(List<TEntity> entities, BulkConfig? bulkConfig = null)
+        public virtual void Remove(List<TEntity> entities, Action<BulkOperation<TEntity>>? options = null)
         {
-            _unitOfWork.WriteContext.BulkDelete(entities, bulkConfig);
+            _unitOfWork.WriteContext.BulkDelete(entities, options);
         }
         public virtual IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includes)
         {

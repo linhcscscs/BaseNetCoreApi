@@ -5,6 +5,9 @@
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
         public decimal NguoiDungId {  get; set; }
+        public string MaTinh {  get; set; }
+        public string MaHuyen {  get; set; }
+        public string MaXa {  get; set; }
         public bool IsRoot { get; set; }
         public bool IsRootSys { get; set; }
         public List<GroupUserPermission>? Permissions { get; set; }

@@ -33,7 +33,7 @@ public partial class PhieuDieuTraCt
 
     public string Ten { get; set; } = null!;
 
-    public DateTime NgaySinh { get; set; }
+    public DateOnly NgaySinh { get; set; }
 
     public string MaGioiTinh { get; set; } = null!;
 
@@ -61,7 +61,7 @@ public partial class PhieuDieuTraCt
 
     public string? MaHoanCanhDacBiet { get; set; }
 
-    public DateTime? NgayTrangThai { get; set; }
+    public DateOnly? NgayTrangThai { get; set; }
 
     public string? ChiTietHoanCanhDacBiet { get; set; }
 

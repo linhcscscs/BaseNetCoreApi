@@ -55,7 +55,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         }
 
 
-        public void SaveChange()
+        public void SaveChanges()
         {
             WriteContext.BulkSaveChanges();
         }

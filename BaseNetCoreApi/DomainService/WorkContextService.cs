@@ -28,6 +28,7 @@ namespace BaseNetCoreApi.DomainService
         private decimal? _nguoiDungId = null;
         private INguoiDungRepository _nguoiDungRepository;
         private IPermissionService _permissionService;
+        private string? _ma_tinh = null, _ma_huyen=null, _ma_xa = null;
         public decimal NguoiDungId
         {
             get
@@ -69,46 +70,46 @@ namespace BaseNetCoreApi.DomainService
         {
             get
             {
-                if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_TINH)))
+                //if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_TINH)))
+                //{
+                //    return _httpContextAccessor.getCookie(UserCookieKey.MA_TINH)!;
+                //}
+                //else
+                //{
+                //    _httpContextAccessor.setCookie(UserCookieKey.MA_TINH, NguoiDung?.MaTinh ?? "");
+                //    return NguoiDung?.MaTinh ?? "";
+                //}
+                if(_ma_tinh == null)
                 {
-                    return _httpContextAccessor.getCookie(UserCookieKey.MA_TINH)!;
+                    _ma_tinh = NguoiDung?.MaTinh ?? "";
                 }
-                else
-                {
-                    _httpContextAccessor.setCookie(UserCookieKey.MA_TINH, NguoiDung?.MaTinh ?? "");
-                    return NguoiDung?.MaTinh ?? "";
-                }
+                return _ma_tinh;
             }
+            set { _ma_tinh = value; }
         }
         public string MA_HUYEN
         {
             get
             {
-                if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_HUYEN)))
+                if (_ma_huyen == null)
                 {
-                    return _httpContextAccessor.getCookie(UserCookieKey.MA_HUYEN)!;
+                    _ma_huyen = NguoiDung?.MaHuyen ?? "";
                 }
-                else
-                {
-                    _httpContextAccessor.setCookie(UserCookieKey.MA_HUYEN, NguoiDung?.MaHuyen ?? "");
-                    return NguoiDung?.MaHuyen ?? "";
-                }
+                return _ma_huyen;
             }
+            set { _ma_huyen = value; }
         }
         public string MA_XA
         {
             get
             {
-                if (!string.IsNullOrEmpty(_httpContextAccessor.getCookie(UserCookieKey.MA_XA)))
+                if (_ma_xa == null)
                 {
-                    return _httpContextAccessor.getCookie(UserCookieKey.MA_XA)!;
+                    _ma_xa = NguoiDung?.MaXa ?? "";
                 }
-                else
-                {
-                    _httpContextAccessor.setCookie(UserCookieKey.MA_XA, NguoiDung?.MaXa ?? "");
-                    return NguoiDung?.MaHuyen ?? "";
-                }
+                return _ma_xa;
             }
+            set { _ma_xa = value; }
         }
         public bool IsRoot
         {

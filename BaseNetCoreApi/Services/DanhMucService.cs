@@ -63,7 +63,7 @@ namespace BaseNetCoreApi.Services
             };
             xa.IsVungKhoKhan = model.HienThuocVungKhoKhan ? 1 : 0;
             _dmXaRepository.InsertOrUpdate(xa);
-            _unitOfWork.SaveChange();
+            _unitOfWork.SaveChanges();
             return ret;
         }
     }
