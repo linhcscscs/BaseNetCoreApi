@@ -7,12 +7,17 @@ using AutoMapper;
 using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.DomainService.Interface;
 using System.Text.Json;
+using EFCore.BulkExtensions;
+using MathNet.Numerics.Statistics.Mcmc;
+using Microsoft.Extensions.Options;
 
 namespace BaseNetCoreApi.Models.Repository
 {
     public interface IDmXaRepository : IRepository<DmXa>
     {
         List<DMPhuongXaDto> GetListByListMaTinhMaHuyen(List<string>? lst_ma_tinh = null, List<string>? lst_ma_huyen = null, string? ten_xa = null, string? ma_xa = null, int? maNamHoc = null);
+        void InsertOrUpdate(DmXa entity);
+        void InsertOrUpdate(List<DmXa> entities);
     }
     public class DmXaRepository : Repository<DmXa>, IDmXaRepository
     {
@@ -21,7 +26,7 @@ namespace BaseNetCoreApi.Models.Repository
         public DmXaRepository(IUnitOfWork unitOfWork,
                                   IQiCache qiCache,
                                   IMapper mapper,
-                                  IWorkContextService workContextService) 
+                                  IWorkContextService workContextService)
             : base(unitOfWork, qiCache)
         {
             _workContextService = workContextService;
@@ -73,8 +78,35 @@ namespace BaseNetCoreApi.Models.Repository
                                             JsonSerializer.Serialize(lst_ma_huyen),
                                             ten_xa ?? "",
                                             maNamHoc),
-                cacheTime: 300000
+            cacheTime: 300000
                 );
+        }
+        public void InsertOrUpdate(DmXa entity)
+        {
+            InsertOrUpdate(new List<DmXa>() { entity });
+        }
+        public void InsertOrUpdate(List<DmXa> entities)
+        {
+            foreach (var entity in entities)
+            {
+                if (entity.Id <= 0)
+                {
+                    entity.NguoiTao = _workContextService.NguoiDungId;
+                    entity.NgayTao = DateTime.Now;
+                    entity.NguoiSua = _workContextService.NguoiDungId;
+                    entity.NgaySua = DateTime.Now;
+                }
+                else
+                {
+                    entity.NguoiSua = _workContextService.NguoiDungId;
+                    entity.NgaySua = DateTime.Now;
+                }
+            }
+            base.InsertOrUpdate(entities, options =>
+            {
+                options.BatchSize = 100;
+                options.ColumnPrimaryKeyExpression = xa => new { xa.Ma };
+            });
         }
     }
 }

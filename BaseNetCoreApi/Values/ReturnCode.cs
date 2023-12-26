@@ -83,5 +83,8 @@ namespace BaseNetCoreApi.Values
         #endregion
 
         #endregion
+
+        #region Common
+        #endregion
     }
 }

@@ -106,16 +106,16 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
             cacheKeys = Cache.Select(kvp => kvp.Key).ToList();
             return cacheKeys;
         }
-        public T? GetByKey<T>(Func<T> getDataSource,
+        public T? GetByKey<T>(Func<T?> getDataSource,
            string key,
            double cacheTime = CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES,
            bool isDeepClone = true)
            where T : new()
         {
-            T? result = new T();
+            T? result = default;
             if (!IsSet(key))
             {
-                result = getDataSource.Invoke() ?? new T();
+                result = getDataSource.Invoke();
                 Set(key, result, cacheTime);
             }
             else
@@ -129,7 +129,8 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
                     Invalidate(key);
                 }
             }
-            return isDeepClone ? result.DeepClone() : result;
+
+            return isDeepClone && result != null ? result.DeepClone() : result;
         }
         public string BuildCachedKey(params object[] objects)
         {

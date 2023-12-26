@@ -8,7 +8,11 @@ namespace BaseNetCoreApi.Models.AutoMapperProfile
     {
         public void CreateMap()
         {
-           CreateMap<DmCapHoc, DMCapHocDto>();
+            CreateMap<DmCapHoc, DMCapHocDto>();
+            CreateMap<DmDanToc, DmDanTocDto>();
+            CreateMap<DmTinh, DMTinhThanhDto>();
+            CreateMap<DmTonGiao, DmTonGiaoDto>();
+            CreateMap<DmGioiTinh, DmGioiTinhDto>();
         }
     }
 }

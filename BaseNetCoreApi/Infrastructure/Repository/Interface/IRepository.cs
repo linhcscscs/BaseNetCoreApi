@@ -1,10 +1,12 @@
 ﻿using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
+using NPOI.SS.Formula.Functions;
 using System.Linq.Expressions;
+using Z.BulkOperations;
 
 namespace BaseNetCoreApi.Infrastructure.Repository.Interface
 {
-    public interface IRepository<TEntity>
+    public interface IRepository<TEntity> where TEntity : class, new()
     {
         string CacheKeyPattern { get; }
         TEntity? FirstOrDefault();
@@ -17,8 +19,8 @@ namespace BaseNetCoreApi.Infrastructure.Repository.Interface
         List<TEntity> GetMulti(Func<TEntity, bool> predicate);
         IQueryable<TEntity> Table { get; }
         void ClearCache();
-        void InsertOrUpdate(TEntity entitiy, BulkConfig? bulkConfig = null);
-        void InsertOrUpdate(List<TEntity> entities, BulkConfig? bulkConfig = null);
+        void InsertOrUpdate(TEntity entitiy, Action<BulkOperation<TEntity>>? options = null);
+        void InsertOrUpdate(List<TEntity> entities, Action<BulkOperation<TEntity>>? options = null);
         void Remove(TEntity entity, BulkConfig? bulkConfig = null);
         void Remove(List<TEntity> entities, BulkConfig? bulkConfig = null);
         IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includes);

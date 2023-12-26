@@ -4,8 +4,11 @@ using BaseNetCoreApi.Infrastructure.Repository.Interface;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Options;
+using NPOI.SS.Formula.Functions;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Z.BulkOperations;
 
 namespace BaseNetCoreApi.Infrastructure.Repository
 {
@@ -64,7 +67,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                 getDataSource: () =>
                 {
                     TEntity? result = null;
-                    if (_tableName == null)
+                    if (_tableName == null || Ma == null)
                     {
                         return result;
                     }
@@ -105,7 +108,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                 getDataSource: () =>
                 {
                     List<TEntity>? result = null;
-                    if (_tableName == null)
+                    if (_tableName == null || listMa.Count == 0)
                     {
                         return result;
                     }
@@ -156,13 +159,13 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         {
             return _dbSetRead.Where(predicate).ToList();
         }
-        public virtual void InsertOrUpdate(TEntity entitiy, BulkConfig? bulkConfig = null)
+        public virtual void InsertOrUpdate(TEntity entitiy, Action<BulkOperation<TEntity>>? options = null)
         {
-            InsertOrUpdate(new List<TEntity>() { entitiy }, bulkConfig);
+            InsertOrUpdate(new List<TEntity>() { entitiy }, options);
         }
-        public virtual void InsertOrUpdate(List<TEntity> entities, BulkConfig? bulkConfig = null)
+        public virtual void InsertOrUpdate(List<TEntity> entities, Action<BulkOperation<TEntity>>? options = null)
         {
-            _unitOfWork.WriteContext.BulkInsertOrUpdate(entities, bulkConfig);
+            _unitOfWork.WriteContext.BulkMerge(entities, options);
         }
         public virtual void Remove(TEntity entity, BulkConfig? bulkConfig = null)
         {

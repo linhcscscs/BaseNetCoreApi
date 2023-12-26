@@ -18,15 +18,24 @@ namespace BaseNetCoreApi.Controllers
         private IDmTinhRepository _dmTinhRepository;
         private IDmHuyenRepository _dmHuyenRepository;
         private IDmXaRepository _dmXaRepository;
+        public IDmDanTocRepository _dmDanTocRepository;
+        public IDmTonGiaoRepository _dmTonGiaoRepository;
+        public IDmGioiTinhRepository _dmGioiTinhRepository;
         public DanhMucController(IDmCapHocRepository dmCapHocRepository,
                                  IDmTinhRepository dmTinhRepository,
                                  IDmHuyenRepository dmHuyenRepository,
-                                 IDmXaRepository dmXaRepository)
+                                 IDmXaRepository dmXaRepository,
+                                 IDmDanTocRepository dmDanTocRepository,
+                                 IDmTonGiaoRepository dmTonGiaoRepository,
+                                 IDmGioiTinhRepository dmGioiTinhRepository)
         {
             _dmCapHocRepository = dmCapHocRepository;
             _dmTinhRepository = dmTinhRepository;
             _dmHuyenRepository = dmHuyenRepository;
             _dmXaRepository = dmXaRepository;
+            _dmDanTocRepository = dmDanTocRepository;
+            _dmTonGiaoRepository = dmTonGiaoRepository;
+            _dmGioiTinhRepository = dmGioiTinhRepository;
         }
         #region DM Đơn vị hành chính
         [HttpGet]
@@ -123,6 +132,48 @@ namespace BaseNetCoreApi.Controllers
             try
             {
                 var result = _dmCapHocRepository.GetDMCapHocDto();
+                return ReturnHelper.ReturnSuccess(result);
+            }
+            catch
+            {
+                return ReturnHelper.ExceptionErrorStatus500;
+            }
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetDMDanToc()
+        {
+            try
+            {
+                var result = _dmDanTocRepository.GetDmDanTocDto();
+                return ReturnHelper.ReturnSuccess(result);
+            }
+            catch
+            {
+                return ReturnHelper.ExceptionErrorStatus500;
+            }
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetDmTonGiao()
+        {
+            try
+            {
+                var result = _dmTonGiaoRepository.GetDmTonGiaoDtos();
+                return ReturnHelper.ReturnSuccess(result);
+            }
+            catch
+            {
+                return ReturnHelper.ExceptionErrorStatus500;
+            }
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetDmGioiTinh()
+        {
+            try
+            {
+                var result = _dmGioiTinhRepository.GetDmGioiTinhDto();
                 return ReturnHelper.ReturnSuccess(result);
             }
             catch
