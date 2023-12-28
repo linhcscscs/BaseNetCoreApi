@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mail;
+using System.Reflection;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -111,6 +112,13 @@ namespace BaseNetCoreApi.Helper
         public static string GetURL(this IHttpContextAccessor httpContextAccessor)
         {
             return httpContextAccessor?.HttpContext?.Request.GetDisplayUrl().ToString() ?? "";
+        }
+        public static Dictionary<string, string> GetFieldValues(Type type)
+        {
+            return type.GetFields(BindingFlags.Public | BindingFlags.Static)
+                      .Where(f => f.FieldType == typeof(string))
+                      .ToDictionary(f => f.Name,
+                                    f => (string?)f.GetValue(null) ?? "");
         }
     }
 }

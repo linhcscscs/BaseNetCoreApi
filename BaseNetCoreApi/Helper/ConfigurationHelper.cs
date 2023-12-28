@@ -91,6 +91,18 @@
                 return GetConfigByName("AppSettings:CookieSecret");
             }
         }
+        public static string QiAuth
+        {
+            get
+            {
+                return GetConfigByName("AppSettings:QiAuth");
+            }
+        }
+
+        public static string API_CSDL(string name)
+        {
+            return GetConfigByName($"API_CSDL:{name}");
+        }
 
         public static string MONGODB_NAME
         {
