@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaseNetCoreApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class PermissionController : ControllerBase
     {
         #region Contructor

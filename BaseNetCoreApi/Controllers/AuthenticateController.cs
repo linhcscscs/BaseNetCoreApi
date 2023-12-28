@@ -10,16 +10,14 @@ using System.Diagnostics;
 namespace BaseNetCoreApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     public class AuthenticateController : ControllerBase
     {
         #region Contructor
-        private INguoiDungService _nguoiDungService;
         private ILogger<AuthenticateController> _logger;
         private IAuthenticateService _authenticateService;
-        public AuthenticateController(INguoiDungService nguoiDungService, ILogger<AuthenticateController> logger, IAuthenticateService authenticateService)
+        public AuthenticateController(ILogger<AuthenticateController> logger, IAuthenticateService authenticateService)
         {
-            _nguoiDungService = nguoiDungService;
             _logger = logger;
             _authenticateService = authenticateService;
         }
@@ -45,7 +43,7 @@ namespace BaseNetCoreApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("AuthenticateController.Login", ex);
+                _logger.LogError(ex,"Login", [model]);
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -69,7 +67,7 @@ namespace BaseNetCoreApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("AuthenticateController.RefreshToken", ex);
+                _logger.LogError(ex, "RefreshToken", [model]);
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -85,12 +83,10 @@ namespace BaseNetCoreApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("AuthenticateController.Logout", ex);
+                _logger.LogError(ex ,"Logout",[model]);
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
-
-
         #endregion
     }
 }

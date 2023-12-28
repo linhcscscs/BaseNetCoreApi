@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaseNetCoreApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     public class NguoiDungController : ControllerBase
     {
         private readonly ILogger<NguoiDungController> _logger;

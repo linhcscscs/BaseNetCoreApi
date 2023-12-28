@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BaseNetCoreApi.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class DanhMucController : ControllerBase
     {
@@ -21,13 +21,15 @@ namespace BaseNetCoreApi.Controllers
         public IDmDanTocRepository _dmDanTocRepository;
         public IDmTonGiaoRepository _dmTonGiaoRepository;
         public IDmGioiTinhRepository _dmGioiTinhRepository;
+        private ILogger<DanhMucController> _logger;
         public DanhMucController(IDmCapHocRepository dmCapHocRepository,
                                  IDmTinhRepository dmTinhRepository,
                                  IDmHuyenRepository dmHuyenRepository,
                                  IDmXaRepository dmXaRepository,
                                  IDmDanTocRepository dmDanTocRepository,
                                  IDmTonGiaoRepository dmTonGiaoRepository,
-                                 IDmGioiTinhRepository dmGioiTinhRepository)
+                                 IDmGioiTinhRepository dmGioiTinhRepository,
+                                 ILogger<DanhMucController> logger)
         {
             _dmCapHocRepository = dmCapHocRepository;
             _dmTinhRepository = dmTinhRepository;
@@ -36,6 +38,7 @@ namespace BaseNetCoreApi.Controllers
             _dmDanTocRepository = dmDanTocRepository;
             _dmTonGiaoRepository = dmTonGiaoRepository;
             _dmGioiTinhRepository = dmGioiTinhRepository;
+            _logger = logger;
         }
         #region DM Đơn vị hành chính
         [HttpGet]
@@ -47,8 +50,9 @@ namespace BaseNetCoreApi.Controllers
                 var result = _dmTinhRepository.GetDMTinhThanhDto();
                 return ReturnHelper.ReturnSuccess(result);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDMTinhThanhPho");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -61,8 +65,9 @@ namespace BaseNetCoreApi.Controllers
                 var result = _dmHuyenRepository.GetListByListMaTinh();
                 return ReturnHelper.ReturnSuccess(result);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDMQuanHuyen");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -81,8 +86,9 @@ namespace BaseNetCoreApi.Controllers
                 return ReturnHelper
                     .ReturnSuccess(new PaginationResponse<DMTinhHuyenDto>(paginationModel));
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDMQuanHuyen", [model]);
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -96,8 +102,9 @@ namespace BaseNetCoreApi.Controllers
                 var result = _dmXaRepository.GetListByListMaTinhMaHuyen();
                 return ReturnHelper.ReturnSuccess(result);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDMPhuongXa");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -118,8 +125,9 @@ namespace BaseNetCoreApi.Controllers
                 return ReturnHelper
                     .ReturnSuccess(new PaginationResponse<DMPhuongXaDto>(paginationModel));
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDMPhuongXa", [model]);
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -134,8 +142,9 @@ namespace BaseNetCoreApi.Controllers
                 var result = _dmCapHocRepository.GetDMCapHocDto();
                 return ReturnHelper.ReturnSuccess(result);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDMCapHoc");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -148,8 +157,9 @@ namespace BaseNetCoreApi.Controllers
                 var result = _dmDanTocRepository.GetDmDanTocDto();
                 return ReturnHelper.ReturnSuccess(result);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDMDanToc");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -162,8 +172,9 @@ namespace BaseNetCoreApi.Controllers
                 var result = _dmTonGiaoRepository.GetDmTonGiaoDtos();
                 return ReturnHelper.ReturnSuccess(result);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDmTonGiao");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -176,8 +187,9 @@ namespace BaseNetCoreApi.Controllers
                 var result = _dmGioiTinhRepository.GetDmGioiTinhDto();
                 return ReturnHelper.ReturnSuccess(result);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetDmGioiTinh");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }

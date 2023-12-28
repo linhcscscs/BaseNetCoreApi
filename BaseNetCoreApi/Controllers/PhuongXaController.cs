@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BaseNetCoreApi.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class PhuongXaController : ControllerBase
     {
@@ -22,7 +22,7 @@ namespace BaseNetCoreApi.Controllers
         }
         [HttpGet]
         [HasPermission(SysTypeAccess.View)]
-        public IActionResult HoSoXaDetailViewModel()
+        public IActionResult HoSoXaDetail()
         {
             try
             {
@@ -35,9 +35,9 @@ namespace BaseNetCoreApi.Controllers
             }
         }
         [HttpPost]
-        //[HasPermission(SysTypeAccess.Edit)]
+        [HasPermission(SysTypeAccess.Edit)]
         [AllowAnonymous]
-        public IActionResult HoSoXaDetailViewModel(HoSoXaDetailEditViewModel model)
+        public IActionResult HoSoXaDetail(HoSoXaDetailEditViewModel model)
         {
             try
             {
