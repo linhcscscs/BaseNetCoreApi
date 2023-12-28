@@ -8,5 +8,7 @@
         Delete,
         Upload,
         Auth,
+        IsRoot,
+        IsMasterRoot,
     }
 }

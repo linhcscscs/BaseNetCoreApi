@@ -35,31 +35,35 @@ namespace BaseNetCoreApi.Infrastructure.AttributeCollection
                 return;
             }
             var permissons = workcontext.Permissons;
-            if (workcontext.IsRoot)
-            {
-                return;
-            }
-            
+
+            var isRoot = workcontext.IsRoot || workcontext.IsRootSys;
+
             var hasPermission = false;
             switch (_sysTypeAccess)
             {
                 case SysTypeAccess.View:
-                    hasPermission = permissons.Any(q => q.IsView == 1);
+                    hasPermission = permissons.Any(q => q.IsView == 1) || isRoot;
                     break;
                 case SysTypeAccess.Add:
-                    hasPermission = permissons.Any(q => q.IsAdd == 1);
+                    hasPermission = permissons.Any(q => q.IsAdd == 1) || isRoot;
                     break;
                 case SysTypeAccess.Edit:
-                    hasPermission = permissons.Any(q => q.IsEdit == 1);
+                    hasPermission = permissons.Any(q => q.IsEdit == 1) || isRoot;
                     break;
                 case SysTypeAccess.Delete:
-                    hasPermission = permissons.Any(q => q.IsDelete == 1);
+                    hasPermission = permissons.Any(q => q.IsDelete == 1) || isRoot;
                     break;
                 case SysTypeAccess.Upload:
-                    hasPermission = permissons.Any(q => q.IsUpload == 1);
+                    hasPermission = permissons.Any(q => q.IsUpload == 1) || isRoot;
                     break;
                 case SysTypeAccess.Auth:
-                    hasPermission = permissons.Any(q => q.IsAuth == 1);
+                    hasPermission = permissons.Any(q => q.IsAuth == 1)|| isRoot;
+                    break;
+                case SysTypeAccess.IsRoot:
+                    hasPermission = isRoot;
+                    break;
+                case SysTypeAccess.IsMasterRoot:
+                    hasPermission = workcontext.IsRootSys;
                     break;
                 default:
                     break;

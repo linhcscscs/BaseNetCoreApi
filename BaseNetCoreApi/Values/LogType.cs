@@ -1,6 +1,6 @@
 ﻿namespace BaseNetCoreApi.Values
 {
-    public class LogType
+    public static class LogType
     {
         public static readonly string TAT_CA = "";
         public static readonly string LOG_IN = "LOG_IN";

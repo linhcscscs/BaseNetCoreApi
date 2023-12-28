@@ -9,6 +9,6 @@ namespace BaseNetCoreApi.Infrastructure.Models.MongoDb
         [BsonId]
         [BsonIgnoreIfDefault]
         [IgnoreDataMember]
-        public ObjectId _id { get; set; }
+        public ObjectId _id { get; set; } = MongoDB.Bson.ObjectId.GenerateNewId();
     }
 }

@@ -7,6 +7,7 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
 {
     public interface IQiCache
     {
+        List<string> GetAllKey();
         object Get(string key);
         T Get<T>(string key);
         void Set(string key, object data, double cacheTime);
@@ -21,12 +22,19 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
            bool isDeepClone = true)
            where T : new();
         void Remove(string cacheKey);
+        void Remove(List<string> cacheKeys);
     }
     public class QiCache : IQiCache
     {
         private ObjectCache Cache
         {
             get { return MemoryCache.Default; }
+        }
+        public List<string> GetAllKey()
+        {
+            var cacheKeys = new List<string>();
+            cacheKeys = Cache.Select(kvp => kvp.Key).ToList();
+            return cacheKeys;
         }
         public T Get<T>(string key)
         {
@@ -83,6 +91,18 @@ namespace BaseNetCoreApi.Infrastructure.CacheProvider
             try
             {
                 Cache.Remove(cacheKey);
+            }
+            catch { }
+        }
+
+        public void Remove(List<string> cacheKeys)
+        {
+            try
+            {
+                foreach (string cacheKey in cacheKeys)
+                {
+                    Remove(cacheKey);
+                }
             }
             catch { }
         }

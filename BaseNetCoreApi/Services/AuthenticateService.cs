@@ -165,6 +165,38 @@ namespace BaseNetCoreApi.Services
             _refreshTokenRepository.Remove(rmvLst);
             _unitOfWork.SaveChanges();
         }
+        public ReturnCode ChonXa(ChonXaLamViecRequest model, out AuthResponse authResponse)
+        {
+            var ret = new ReturnCode();
+            authResponse = new AuthResponse();
+            var rftModel = _refreshTokenRepository.FirstOrDefault(q => q.NguoiDungId == model.NguoiDungId && q.Token == model.RefreshToken && q.ExpDate >= DateTime.Now);
+            if (rftModel == null)
+            {
+                ret = new ReturnCode(EReturnCode.TokenInvalid);
+                return ret;
+            }
+            if (rftModel.Active == false)
+            {
+                ForceReLogin(new List<decimal>() { _workContextService.NguoiDungId });
+                ret = new ReturnCode(EReturnCode.TokenInvalid);
+                return ret;
+            }
+
+            var nguoiDung = _nguoiDungRepository.FirstOrDefault(q => q.Id == model.NguoiDungId);
+            if (nguoiDung == null)
+            {
+                ret = new ReturnCode(EReturnCode.TokenInvalid);
+                return ret;
+            }
+
+            // Refresh Token
+            rftModel.Active = false;
+            _refreshTokenRepository.InsertOrUpdate(rftModel);
+            _unitOfWork.SaveChanges();
+
+            authResponse = GetAuth(nguoiDung, model.MaTinh, model.MaHuyen, model.MaXa);
+            return ret;
+        }
         public ReturnCode Login(LoginRequest model, out AuthResponse authResponse)
         {
             var ret = new ReturnCode();
@@ -179,7 +211,6 @@ namespace BaseNetCoreApi.Services
             var httpContextAccessor = _workContextService.HttpContextAccessor;
             _logSYSCollection.Save(new LogSYSModel()
             {
-                _id = MongoDB.Bson.ObjectId.GenerateNewId(),
                 MA_NAM_HOC = _workContextService.MA_NAM_HOC,
                 MA_TINH = model.ma_tinh,
                 MA_HUYEN = model.ma_huyen,

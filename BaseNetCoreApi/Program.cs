@@ -193,6 +193,8 @@ services.AddTransient<INguoiDungService, NguoiDungService>();
 services.AddTransient<IPermissionService, PermissionService>();
 services.AddTransient<IAuthenticateService, AuthenticateService>();
 services.AddTransient<IDanhMucService, DanhMucService>();
+services.AddTransient<IMenuService, MenuService>();
+services.AddTransient<IDongBoDanhMucService, DongBoDanhMucService>();
 #endregion
 #region Repository
 #region Base Repository
@@ -212,6 +214,8 @@ services.AddScoped<IDmXaRepository, DmXaRepository>();
 services.AddScoped<IDmDanTocRepository, DmDanTocRepository>();
 services.AddScoped<IDmTonGiaoRepository, DmTonGiaoRepository>();
 services.AddScoped<IDmGioiTinhRepository, DmGioiTinhRepository>();
+services.AddScoped<IDMPhongGdRepository, DMPhongGdRepository>();
+services.AddScoped<ITruongRepository , TruongRepository>();
 #endregion
 #region Collection
 #region Base Collection

@@ -53,7 +53,10 @@ namespace BaseNetCoreApi.Infrastructure.Repository
             var context = isWrite ? WriteContext : ReadContext;
             return context.Database.SqlQueryRaw<T>(sqlQuery);
         }
-
+        public int ExcuteSqlCommand(string sqlCommand)
+        {
+             return WriteContext.Database.ExecuteSqlRaw(sqlCommand);
+        }
 
         public void SaveChanges()
         {

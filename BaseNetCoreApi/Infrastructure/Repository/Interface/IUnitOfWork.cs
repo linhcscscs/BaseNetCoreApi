@@ -14,5 +14,6 @@ namespace BaseNetCoreApi.Infrastructure.Repository.Interface
         void BulkSaveChanges(BulkConfig bulkConfig);
         IQueryable<T> SqlQuery<T>(FormattableString sqlQuery, bool isWrite = false);
         IQueryable<T> SqlQuery<T>(string sqlQuery, bool isWrite = false);
+        int ExcuteSqlCommand(string sqlCommand);
     }
 }

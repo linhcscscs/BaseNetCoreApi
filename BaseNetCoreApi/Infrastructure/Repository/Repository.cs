@@ -166,6 +166,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         public virtual void InsertOrUpdate(List<TEntity> entities, Action<BulkOperation<TEntity>>? options = null)
         {
             _unitOfWork.WriteContext.BulkMerge(entities, options);
+            ClearCache();
         }
         public virtual void Remove(TEntity entity, Action<BulkOperation<TEntity>>? options = null)
         {
@@ -174,6 +175,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         public virtual void Remove(List<TEntity> entities, Action<BulkOperation<TEntity>>? options = null)
         {
             _unitOfWork.WriteContext.BulkDelete(entities, options);
+            ClearCache();
         }
         public virtual IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includes)
         {

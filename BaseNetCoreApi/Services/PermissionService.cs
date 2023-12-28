@@ -1,4 +1,5 @@
-﻿using BaseNetCoreApi.DomainService;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using BaseNetCoreApi.DomainService;
 using BaseNetCoreApi.DomainService.Interface;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
 using BaseNetCoreApi.Infrastructure.CacheProvider.CacheKey;
@@ -20,13 +21,15 @@ namespace BaseNetCoreApi.Services
         private INguoiDungRepository _nguoiDungRepository;
         private IGroupUserRepository _groupUserRepository;
         private IGroupUserMenuRepository _groupUserMenuRepository;
+        private IMenuService _menuService;
         public PermissionService(IPhoCapGDContextProvider contextProvider,
             IWorkContextService workContextService,
             IQiCache qiCache,
             IMenuRepository menuRepository,
             INguoiDungRepository nguoiDungRepository,
             IGroupUserRepository groupUserRepository,
-            IGroupUserMenuRepository groupUserMenuRepository)
+            IGroupUserMenuRepository groupUserMenuRepository,
+            IMenuService menuService)
         {
             _contextProvider = contextProvider;
             _workContextService = workContextService;
@@ -35,23 +38,11 @@ namespace BaseNetCoreApi.Services
             _nguoiDungRepository = nguoiDungRepository;
             _groupUserRepository = groupUserRepository;
             _groupUserMenuRepository = groupUserMenuRepository;
+            _menuService = menuService;
         }
         #endregion
 
         #region Method
-        public Menu? GetMenuByPath(string path)
-        {
-            if (path[0] != '~')
-            {
-                path = "~" + path;
-            }
-            return _qiCache.GetByKey(
-               getDataSource: () => _menuRepository.FirstOrDefault(q => q.Link == path),
-               key: _qiCache.BuildCachedKey("Menu", "GetMenuByPath", path),
-               cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_24_HOURS,
-               isDeepClone: true
-               );
-        }
         public GroupUser? GetGroupUserByNguoiDung(decimal nguoiDungId)
         {
             var nguoiDung = _nguoiDungRepository.FirstOrDefault(q => q.Id == nguoiDungId);
@@ -68,44 +59,40 @@ namespace BaseNetCoreApi.Services
 
         public List<GroupUserMenu> GetGroupUserMenuByNguoiDung(decimal nguoiDungId)
         {
-            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, false))
+            var groupUser = GetGroupUserByNguoiDung(nguoiDungId);
+            if (groupUser == null)
             {
-                var groupUser = GetGroupUserByNguoiDung(nguoiDungId);
-                if (groupUser == null)
-                {
-                    return new List<GroupUserMenu>();
-                }
-                return _qiCache.GetByKey(
-                   getDataSource: () => _groupUserMenuRepository
-                            .Include(i => i.Menu)
-                            .Where(q => q.GroupUserId == groupUser.GroupUserId)
-                            .ToList(),
-                   key: _qiCache.BuildCachedKey(CacheKey.QUYEN, "GetGroupUserMenuByNguoiDung", nguoiDungId),
-                   cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
-                   );
+                return new List<GroupUserMenu>();
             }
+            return _qiCache.GetByKey(
+               getDataSource: () => _groupUserMenuRepository
+                        .Include(i => i.Menu)
+                        .Where(q => q.GroupUserId == groupUser.GroupUserId && q.Menu.IsView == 1)
+                        .ToList(),
+               key: _qiCache.BuildCachedKey(CacheKey.QUYEN, "GetGroupUserMenuByNguoiDung", nguoiDungId),
+               cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
+               );
+
         }
 
         public List<GroupUserMenu> GetGroupUserMenuByNguoiDungByPath(decimal nguoiDungId, string path)
         {
-            using (var context = _contextProvider.GetContext(_workContextService.MA_NAM_HOC, false))
+
+            var result = new List<GroupUserMenu>();
+            var menu = _menuService.GetMenuByPath(path);
+            if (menu == null)
             {
-                var result = new List<GroupUserMenu>();
-                var menu = GetMenuByPath(path);
-                if (menu == null)
-                {
-                    return result;
-                }
-
-                var lstGroupUser = GetGroupUserMenuByNguoiDung(nguoiDungId);
-
-                return _qiCache.GetByKey(
-                   getDataSource: () => lstGroupUser
-                            .Where(q => menu.MenuId == q.MenuId).ToList(),
-                   key: _qiCache.BuildCachedKey(CacheKey.QUYEN, "GetGroupUserMenuByNguoiDungByPath", nguoiDungId, path),
-                   cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
-                   );
+                return result;
             }
+
+            var lstGroupUser = GetGroupUserMenuByNguoiDung(nguoiDungId);
+
+            return _qiCache.GetByKey(
+               getDataSource: () => lstGroupUser
+                        .Where(q => menu.MenuId == q.MenuId).ToList(),
+               key: _qiCache.BuildCachedKey(CacheKey.QUYEN, "GetGroupUserMenuByNguoiDungByPath", nguoiDungId, path),
+               cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
+               );
         }
         #endregion
     }

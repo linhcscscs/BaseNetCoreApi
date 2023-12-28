@@ -13,6 +13,7 @@ namespace BaseNetCoreApi.Models.Repository
     public interface IDmHuyenRepository : IRepository<DmHuyen>
     {
         List<DMTinhHuyenDto> GetListByListMaTinh(List<string>? lst_ma_tinh = null, string ten_huyen = "", int? maNamHoc = null);
+        void InsertOrUpdate(List<DmHuyen> lstHuyen);
     }
     public class DmHuyenRepository : Repository<DmHuyen>, IDmHuyenRepository
     {
@@ -53,6 +54,19 @@ namespace BaseNetCoreApi.Models.Repository
                 key: _qiCache.BuildCachedKey(CacheKeyPattern, "GetListByListMaTinh", JsonSerializer.Serialize(lst_ma_tinh), ten_huyen, maNamHoc),
                 cacheTime: 300000
                 );
+        }
+        public void InsertOrUpdate(List<DmHuyen> lstHuyen)
+        {
+            base.InsertOrUpdate(lstHuyen, options =>
+            {
+                options.BatchSize = 100;
+                options.ColumnPrimaryKeyExpression = huyen => new
+                {
+                    huyen.Ma,
+                    huyen.MaNamHoc,
+                    huyen.MaTinh
+                };
+            });
         }
     }
 }

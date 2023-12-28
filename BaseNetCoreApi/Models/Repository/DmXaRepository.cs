@@ -18,6 +18,7 @@ namespace BaseNetCoreApi.Models.Repository
         List<DMPhuongXaDto> GetListByListMaTinhMaHuyen(List<string>? lst_ma_tinh = null, List<string>? lst_ma_huyen = null, string? ten_xa = null, string? ma_xa = null, int? maNamHoc = null);
         void InsertOrUpdate(DmXa entity);
         void InsertOrUpdate(List<DmXa> entities);
+        void UpdateIdHuyen(string maTinh = "", string maHuyen = "");
     }
     public class DmXaRepository : Repository<DmXa>, IDmXaRepository
     {
@@ -105,8 +106,29 @@ namespace BaseNetCoreApi.Models.Repository
             base.InsertOrUpdate(entities, options =>
             {
                 options.BatchSize = 100;
-                options.ColumnPrimaryKeyExpression = xa => new { xa.Ma };
+                options.ColumnPrimaryKeyExpression = xa => new { 
+                    xa.Ma ,
+                    xa.MaNamHoc,
+                    xa.MaHuyen
+                };
             });
+        }
+        public void UpdateIdHuyen (string maTinh = "", string maHuyen = "")
+        {
+            var sql = @$"UPDATE x
+                                SET x.ID_HUYEN=h.ID
+                                FROM dbo.DM_XA AS x
+                                     JOIN dbo.DM_HUYEN AS h ON x.MA_HUYEN=h.MA AND h.MA_NAM_HOC={_workContextService.MA_NAM_HOC}
+                                WHERE x.MA_NAM_HOC={_workContextService.MA_NAM_HOC} ";
+            if (!string.IsNullOrEmpty(maTinh))
+            {
+                sql += $" AND x.MA_TINH='{maTinh}' ";
+            }
+            if (!string.IsNullOrEmpty(maHuyen))
+            {
+                sql += $" AND x.MA_HUYEN='{maHuyen}' ";
+            }
+            _unitOfWork.ExcuteSqlCommand(sql);
         }
     }
 }

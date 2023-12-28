@@ -25,7 +25,7 @@ namespace BaseNetCoreApi.Infrastructure.MongoDBClient
         {
             get => _mongoDbClientProvider.MongoDataBase.GetCollection<T>(TABLE_NAME);
         }
-        public IQueryable<T> Table => DataBase.AsQueryable();
+        public IQueryable<T> Table => DataBase.AsQueryable(new AggregateOptions { AllowDiskUse = true });
         public virtual void ClearCache()
         {
             _qiCache.RemoveByFirstName(CacheKeyPattern);
