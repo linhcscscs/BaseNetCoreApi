@@ -11,11 +11,11 @@ namespace BaseNetCoreApi.Infrastructure.Repository.Interface
         string CacheKeyPattern { get; }
         TEntity? FirstOrDefault();
         TEntity? FirstOrDefault(Func<TEntity, bool> predicate);
-        TEntity? GetByMa(string Ma);
+        TEntity? GetByMa(string Ma, string CodeField = "");
         List<TEntity>? GetAll(bool orderByThuTu = false);
-        List<TEntity>? GetByListMa(List<string> listMa);
-        TEntity? GetById(decimal Id);
-        List<TEntity>? GetByListId(List<decimal> listId);
+        List<TEntity>? GetByListMa(List<string> listMa, string CodeField = "");
+        TEntity? GetById(decimal Id, string IdField = "");
+        List<TEntity>? GetByListId(List<decimal> listId, string IdField = "");
         IEnumerable<TEntity> GetMulti(Func<TEntity, bool> predicate);
         IQueryable<TEntity> Table { get; }
         void ClearCache();

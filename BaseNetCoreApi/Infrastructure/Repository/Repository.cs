@@ -61,7 +61,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         {
             _qiCache.RemoveByFirstName(_cacheKeyPattern);
         }
-        public virtual TEntity? GetByMa(string Ma)
+        public virtual TEntity? GetByMa(string Ma, string CodeField = "")
         {
             return _qiCache.GetByKey(
                 getDataSource: () =>
@@ -71,7 +71,8 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                     {
                         return result;
                     }
-                    string sql = $"SELECT TOP 1 * FROM {_tableName} WHERE MA = '{Ma}'";
+                    CodeField = string.IsNullOrEmpty(CodeField) ? "MA" : CodeField;
+                    string sql = $"SELECT TOP 1 * FROM {_tableName} WHERE {CodeField} = '{Ma}'";
                     result = _dbSetRead.FromSqlRaw(sql).FirstOrDefault();
                     return result;
                 },
@@ -102,7 +103,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                 key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetAll", orderByThuTu)
                 );
         }
-        public virtual List<TEntity>? GetByListMa(List<string> listMa)
+        public virtual List<TEntity>? GetByListMa(List<string> listMa, string CodeField = "")
         {
             return _qiCache.GetByKey(
                 getDataSource: () =>
@@ -112,15 +113,16 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                     {
                         return result;
                     }
+                    CodeField = string.IsNullOrEmpty(CodeField) ? "MA" : CodeField;
                     var lstQuery = UltilHelper.ListToStringQuery(listMa);
-                    string sql = $"SELECT * FROM {_tableName} WHERE MA IN '{lstQuery}'";
+                    string sql = $"SELECT * FROM {_tableName} WHERE {CodeField} IN '{lstQuery}'";
                     result = _dbSetRead.FromSqlRaw(sql).ToList();
                     return result;
                 },
                 key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetByListMa", listMa)
                 );
         }
-        public virtual TEntity? GetById(decimal Id)
+        public virtual TEntity? GetById(decimal Id, string IdField = "")
         {
             return _qiCache.GetByKey(
                 getDataSource: () =>
@@ -130,14 +132,15 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                     {
                         return result;
                     }
-                    string sql = $"SELECT TOP 1 * FROM {_tableName} WHERE Id = '{Id}'";
+                    IdField = string.IsNullOrEmpty(IdField) ? "Id" : IdField;
+                    string sql = $"SELECT TOP 1 * FROM {_tableName} WHERE {IdField} = '{Id}'";
                     result = _dbSetRead.FromSqlRaw(sql).FirstOrDefault();
                     return result;
                 },
                 key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetById", Id)
                 );
         }
-        public virtual List<TEntity>? GetByListId(List<decimal> listId)
+        public virtual List<TEntity>? GetByListId(List<decimal> listId, string IdField = "")
         {
             return _qiCache.GetByKey(
                     getDataSource: () =>
@@ -147,8 +150,9 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                         {
                             return result;
                         }
+                        IdField = string.IsNullOrEmpty(IdField) ? "Id" : IdField;
                         var lstQuery = UltilHelper.ListToStringQuery(listId);
-                        string sql = $"SELECT * FROM {_tableName} WHERE Id IN '{lstQuery}'";
+                        string sql = $"SELECT * FROM {_tableName} WHERE {IdField} IN '{lstQuery}'";
                         result = _dbSetRead.FromSqlRaw(sql).ToList();
                         return result;
                     },

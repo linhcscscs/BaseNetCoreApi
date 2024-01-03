@@ -156,7 +156,7 @@ namespace BaseNetCoreApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "AddNewMenu");
+                _logger.LogError(ex, "AddMenu");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }
@@ -200,7 +200,7 @@ namespace BaseNetCoreApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "AddNewMenu");
+                _logger.LogError(ex, "DongBo");
                 return ReturnHelper.ExceptionErrorStatus500;
             }
         }

@@ -10,7 +10,11 @@ namespace BaseNetCoreApi.Helper
         {
             if (System.IO.File.Exists(filePath))
             {
-                return controllerBase.File(System.IO.File.OpenRead(filePath), "application/octet-stream", fileName);
+                var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose);
+                return controllerBase.File(
+                        fileStream: fs,
+                        contentType: System.Net.Mime.MediaTypeNames.Application.Octet,
+                        fileDownloadName: fileName);
             }
             return controllerBase.NotFound();
         }

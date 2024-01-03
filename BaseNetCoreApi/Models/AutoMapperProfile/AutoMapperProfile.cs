@@ -24,6 +24,9 @@ namespace BaseNetCoreApi.Models.AutoMapperProfile
             #region Common
             CreateMap<Menu, MenuViewModel>();
             #endregion
+
+            #region NhomQuyen
+            #endregion
         }
     }
 }

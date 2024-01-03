@@ -1,4 +1,6 @@
-﻿namespace BaseNetCoreApi.Helper
+﻿using Microsoft.AspNetCore.Hosting;
+
+namespace BaseNetCoreApi.Helper
 {
     public static class ConfigurationHelper
     {
@@ -35,6 +37,13 @@
                     uploadFileLimit = uploadFileLimitTemp;
                 }
                 return uploadFileLimit;
+            }
+        }
+        public static string ServerMapPath
+        {
+            get
+            {
+                return WebHostEnvironment.ContentRootPath;
             }
         }
         public static string FileFolerInternalURL

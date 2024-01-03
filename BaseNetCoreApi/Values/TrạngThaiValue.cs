@@ -2,7 +2,7 @@
 
 namespace BaseNetCoreApi.Values
 {
-    public class TrạngThaiValue
+    public class TrangThaiValue
     {
 
         public static int TAO_MOI = 0;
@@ -27,9 +27,9 @@ namespace BaseNetCoreApi.Values
                 case 1:
                     return "Hiệu lực";
                 case 2:
-                    return "Hủy";
-                case 3:
                     return "Tạm ngưng";
+                case 3:
+                    return "Hủy";
                 default:
                     return "Hủy;";
             }

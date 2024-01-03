@@ -36,14 +36,7 @@ namespace BaseNetCoreApi.Models.Repository
 
         public Menu? GetById(long Id)
         {
-            return _qiCache.GetByKey(
-                getDataSource: () =>
-                {
-                    var result = _dbSetRead.First(q => q.MenuId == Id);
-                    return result;
-                },
-                key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetById", Id)
-                );
+            return base.GetById(Id, "MenuId");
         }
         public List<Menu> GetByListId(List<long> listId)
         {
