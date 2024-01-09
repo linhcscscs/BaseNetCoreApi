@@ -1,6 +1,7 @@
 ﻿using BaseNetCoreApi.Helper;
 using BaseNetCoreApi.Infrastructure.CacheProvider;
 using BaseNetCoreApi.Infrastructure.Repository.Interface;
+using DocumentFormat.OpenXml.Spreadsheet;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -115,7 +116,7 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                     }
                     CodeField = string.IsNullOrEmpty(CodeField) ? "MA" : CodeField;
                     var lstQuery = UltilHelper.ListToStringQuery(listMa);
-                    string sql = $"SELECT * FROM {_tableName} WHERE {CodeField} IN '{lstQuery}'";
+                    string sql = $"SELECT * FROM {_tableName} WHERE {CodeField} IN ({lstQuery})";
                     result = _dbSetRead.FromSqlRaw(sql).ToList();
                     return result;
                 },
@@ -123,6 +124,24 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                 );
         }
         public virtual TEntity? GetById(decimal Id, string IdField = "")
+        {
+            return _qiCache.GetByKey(
+                getDataSource: () =>
+                {
+                    TEntity? result = null;
+                    if (_tableName == null)
+                    {
+                        return result;
+                    }
+                    IdField = string.IsNullOrEmpty(IdField) ? "Id" : IdField;
+                    string sql = $"SELECT TOP 1 * FROM {_tableName} WHERE {IdField} = '{Id}'";
+                    result = _dbSetRead.FromSqlRaw(sql).FirstOrDefault();
+                    return result;
+                },
+                key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetById", Id)
+                );
+        }
+        public virtual TEntity? GetById(long Id, string IdField = "")
         {
             return _qiCache.GetByKey(
                 getDataSource: () =>
@@ -152,7 +171,26 @@ namespace BaseNetCoreApi.Infrastructure.Repository
                         }
                         IdField = string.IsNullOrEmpty(IdField) ? "Id" : IdField;
                         var lstQuery = UltilHelper.ListToStringQuery(listId);
-                        string sql = $"SELECT * FROM {_tableName} WHERE {IdField} IN '{lstQuery}'";
+                        string sql = $"SELECT * FROM {_tableName} WHERE {IdField} IN ({lstQuery})";
+                        result = _dbSetRead.FromSqlRaw(sql).ToList();
+                        return result;
+                    },
+                    key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetByListId", listId)
+                    );
+        }
+        public virtual List<TEntity>? GetByListId(List<long> listId, string IdField = "")
+        {
+            return _qiCache.GetByKey(
+                    getDataSource: () =>
+                    {
+                        List<TEntity>? result = null;
+                        if (_tableName == null)
+                        {
+                            return result;
+                        }
+                        IdField = string.IsNullOrEmpty(IdField) ? "Id" : IdField;
+                        var lstQuery = UltilHelper.ListToStringQuery(listId);
+                        string sql = $"SELECT * FROM {_tableName} WHERE {IdField} IN ({lstQuery})";
                         result = _dbSetRead.FromSqlRaw(sql).ToList();
                         return result;
                     },
@@ -170,6 +208,26 @@ namespace BaseNetCoreApi.Infrastructure.Repository
         public virtual void InsertOrUpdate(List<TEntity> entities, Action<BulkOperation<TEntity>>? options = null)
         {
             _unitOfWork.WriteContext.BulkMerge(entities, options);
+            ClearCache();
+        }
+        public virtual void Insert(TEntity entitiy)
+        {
+            _unitOfWork.WriteContext.Add(entitiy);
+            ClearCache();
+        }
+        public virtual void Insert(List<TEntity> entities)
+        {
+            _unitOfWork.WriteContext.AddRange(entities);
+            ClearCache();
+        }
+        public virtual void Update(TEntity entitiy)
+        {
+            _unitOfWork.WriteContext.Update(entitiy);
+            ClearCache();
+        }
+        public virtual void Update(List<TEntity> entities)
+        {
+            _unitOfWork.WriteContext.UpdateRange(entities);
             ClearCache();
         }
         public virtual void Remove(TEntity entity, Action<BulkOperation<TEntity>>? options = null)

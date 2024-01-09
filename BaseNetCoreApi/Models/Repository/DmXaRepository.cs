@@ -10,6 +10,7 @@ using System.Text.Json;
 using EFCore.BulkExtensions;
 using MathNet.Numerics.Statistics.Mcmc;
 using Microsoft.Extensions.Options;
+using Z.BulkOperations;
 
 namespace BaseNetCoreApi.Models.Repository
 {
@@ -86,7 +87,7 @@ namespace BaseNetCoreApi.Models.Repository
         {
             InsertOrUpdate(new List<DmXa>() { entity });
         }
-        public void InsertOrUpdate(List<DmXa> entities)
+        public override void InsertOrUpdate(List<DmXa> entities, Action<BulkOperation<DmXa>>? options = null)
         {
             foreach (var entity in entities)
             {
@@ -106,8 +107,8 @@ namespace BaseNetCoreApi.Models.Repository
             base.InsertOrUpdate(entities, options =>
             {
                 options.BatchSize = 100;
-                options.ColumnPrimaryKeyExpression = xa => new { 
-                    xa.Ma ,
+                options.ColumnPrimaryKeyExpression = xa => new {
+                    xa.Ma,
                     xa.MaNamHoc,
                     xa.MaHuyen
                 };

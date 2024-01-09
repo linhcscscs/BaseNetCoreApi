@@ -2,6 +2,7 @@
 using BaseNetCoreApi.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Values;
+using System.Data;
 
 namespace BaseNetCoreApi.Services.Interface
 {
@@ -9,6 +10,10 @@ namespace BaseNetCoreApi.Services.Interface
     {
         List<DSNhomQuyenViewModel> GetDsNhomQuyen(DSNhomQuyenRequest model);
         (string? filePath, string? fileName) GetDsNhomQuyenExcel(DSNhomQuyenRequest model);
+        ReturnCode AddDsNhomQuyen(List<DSNhomQuyenViewModel> model, out List<DSNhomQuyenViewModel> result);
+        string? AddDsNhomQuyenExcelUploadFile(IFormFile file);
+        DataTable AddDsNhomQuyenExcelResult(string filePath);
+        ReturnCode AddDsNhomQuyenExcelSave(DSNhomQuyenImportExcelSave model, out List<ResultEntity> result);
         ReturnCode EditDsNhomQuyen(DSNhomQuyenEditModel model);
         ReturnCode DeleteDsNhomQuyen(DSNhomQuyenDeleteModel model);
         ReturnCode GetGroupUserMenuEntity(long Id, out List<GroupUserMenuEntity> result);

@@ -12,6 +12,7 @@ using MathNet.Numerics.Statistics.Mcmc;
 using Microsoft.Extensions.Options;
 using DocumentFormat.OpenXml.InkML;
 using BaseNetCoreApi.Values;
+using Z.BulkOperations;
 
 namespace BaseNetCoreApi.Models.Repository
 {
@@ -34,9 +35,9 @@ namespace BaseNetCoreApi.Models.Repository
             _workContextService = workContextService;
             _mapper = mapper;
         }
-        public void InsertOrUpdate(List<PhongGd> phongGds)
+        public override void InsertOrUpdate(List<PhongGd> entities, Action<BulkOperation<PhongGd>>? options = null)
         {
-            base.InsertOrUpdate(phongGds, options =>
+            base.InsertOrUpdate(entities, options =>
             {
                 options.BatchSize = 100;
                 options.ColumnPrimaryKeyExpression = phong => new
@@ -47,6 +48,7 @@ namespace BaseNetCoreApi.Models.Repository
                 };
             });
         }
+
         public void UpdateIdHuyen(string maSGD = "", string maPGD = "")
         {
             var sql = @$"UPDATE p

@@ -5,7 +5,7 @@ namespace BaseNetCoreApi.Services.Interface
 {
     public interface INguoiDungService
     {
-        public NguoiDung? GetByNguoiDungId(decimal id);
+        List<NguoiDungViewModel> GetNguoiDungViewModel(string maTinh, string maHuyen, string maXa);
         NguoiDung? GetByUsernameAndPassword(LoginRequest model);
     }
 }

@@ -216,6 +216,7 @@ services.AddScoped<IDmTonGiaoRepository, DmTonGiaoRepository>();
 services.AddScoped<IDmGioiTinhRepository, DmGioiTinhRepository>();
 services.AddScoped<IDMPhongGdRepository, DMPhongGdRepository>();
 services.AddScoped<ITruongRepository , TruongRepository>();
+services.AddScoped<INguoiDungToThonRepository, NguoiDungToThonRepository>();
 #endregion
 #region Collection
 #region Base Collection

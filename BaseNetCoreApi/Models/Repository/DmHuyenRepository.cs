@@ -7,6 +7,7 @@ using BaseNetCoreApi.DomainService.Interface;
 using DocumentFormat.OpenXml.InkML;
 using BaseNetCoreApi.Helper;
 using System.Text.Json;
+using Z.BulkOperations;
 
 namespace BaseNetCoreApi.Models.Repository
 {
@@ -55,9 +56,9 @@ namespace BaseNetCoreApi.Models.Repository
                 cacheTime: 300000
                 );
         }
-        public void InsertOrUpdate(List<DmHuyen> lstHuyen)
+        public override void InsertOrUpdate(List<DmHuyen> entities, Action<BulkOperation<DmHuyen>>? options = null)
         {
-            base.InsertOrUpdate(lstHuyen, options =>
+            base.InsertOrUpdate(entities, options =>
             {
                 options.BatchSize = 100;
                 options.ColumnPrimaryKeyExpression = huyen => new

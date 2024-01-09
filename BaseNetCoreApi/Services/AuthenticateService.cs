@@ -95,7 +95,7 @@ namespace BaseNetCoreApi.Services
                 MaHuyen = ma_huyen,
                 MaXa = ma_xa
             };
-            _refreshTokenRepository.InsertOrUpdate(rftModel);
+            _refreshTokenRepository.Insert(rftModel);
             _unitOfWork.SaveChanges();
             return refreshToken;
         }
@@ -191,7 +191,7 @@ namespace BaseNetCoreApi.Services
 
             // Refresh Token
             rftModel.Active = false;
-            _refreshTokenRepository.InsertOrUpdate(rftModel);
+            _refreshTokenRepository.Update(rftModel);
             _unitOfWork.SaveChanges();
 
             authResponse = GetAuth(nguoiDung, model.MaTinh, model.MaHuyen, model.MaXa);
@@ -252,7 +252,7 @@ namespace BaseNetCoreApi.Services
 
             // Refresh Token
             rftModel.Active = false;
-            _refreshTokenRepository.InsertOrUpdate(rftModel);
+            _refreshTokenRepository.Update(rftModel);
             _unitOfWork.SaveChanges();
 
             authResponse = GetAuth(nguoiDung, rftModel.MaTinh, rftModel.MaHuyen, rftModel.MaXa);
@@ -264,7 +264,7 @@ namespace BaseNetCoreApi.Services
             if (rftModel != null)
             {
                 rftModel.Active = false;
-                _refreshTokenRepository.InsertOrUpdate(rftModel);
+                _refreshTokenRepository.Update(rftModel);
                 _unitOfWork.SaveChanges();
             }
         }

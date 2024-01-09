@@ -8,13 +8,14 @@ using BaseNetCoreApi.Models.ViewModel;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using MathNet.Numerics.Statistics.Mcmc;
 using Microsoft.EntityFrameworkCore;
+using Z.BulkOperations;
 
 namespace BaseNetCoreApi.Models.Repository
 {
     public interface IMenuRepository : IRepository<Menu>
     {
         List<MenuAdminViewModel> GetMenuAdminViewModels();
-        List<Menu> GetByListId(List<long> listId);
+        List<Menu>? GetByListId(List<long> listId);
         Menu? GetById(long Id);
         List<MenuViewModel> GetMenuViewModels();
     }
@@ -38,16 +39,9 @@ namespace BaseNetCoreApi.Models.Repository
         {
             return base.GetById(Id, "MenuId");
         }
-        public List<Menu> GetByListId(List<long> listId)
+        public List<Menu>? GetByListId(List<long> listId)
         {
-            return _qiCache.GetByKey(
-                    getDataSource: () =>
-                    {
-                        var result = _dbSetRead.Where(q => listId.Contains(q.MenuId)).ToList();
-                        return result;
-                    },
-                    key: _qiCache.BuildCachedKey(_cacheKeyPattern, "GetByListId", listId)
-                    );
+            return base.GetByListId(listId, "MenuId");
         }
     }
 }

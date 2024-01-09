@@ -1,4 +1,5 @@
 ﻿using BaseNetCoreApi.Models.Dtos;
+using BaseNetCoreApi.Models.Entities;
 using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Values;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -6,11 +7,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mail;
 using System.Reflection;
+using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -119,6 +122,217 @@ namespace BaseNetCoreApi.Helper
                       .Where(f => f.FieldType == typeof(string))
                       .ToDictionary(f => f.Name,
                                     f => (string?)f.GetValue(null) ?? "");
+        }
+        public static string ToNormalizeLowerRelace(this string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+                return value.Trim().ToLower().Normalize(NormalizationForm.FormKC).Replace(" ", "");
+            return value;
+        }
+        public static int? ConvertObjectToint(object value)
+        {
+            if (value == null) return null;
+            try
+            {
+                int res = Convert.ToInt32(value.ToString().Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static bool ConvertIntToBool(int? value)
+        {
+            return (value ?? 0) == 1;
+        }
+        public static bool? ConvertStringToBool(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                if (value.ToLower() == "true" || value == "1")
+                    return true;
+                return false;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static DateTime? ConvertStringToDate(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                DateTime res = Convert.ToDateTime(value);
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static TimeSpan? ConvertStringToTimeSpan(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                TimeSpan res = TimeSpan.Parse(value);
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static short? ConvertStringToShort(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                short res = Convert.ToInt16(value.Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static Single? ConvertStringToSingle(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                Single res = Convert.ToSingle(value.Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static Guid? ConvertStringToGuid(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                Guid res = Guid.Parse(value.Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static Double? ConvertStringToDouble(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                Double res = Convert.ToDouble(value.Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static float? ConvertStringToFloat(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                float res = float.Parse(value.Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static int? ConvertStringToInt(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                int res = Convert.ToInt32(value.Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static long? ConvertStringToLong(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                long res = Convert.ToInt64(value.Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static decimal? ConvertStringToDecimal(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return null;
+            try
+            {
+                decimal res = Convert.ToDecimal(value.Trim());
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static DateTime? ConvertDDMMYYToDateTime(string value)
+        {
+            try
+            {
+                return DateTime.ParseExact(value, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            }
+            catch { }
+            return null;
+        }
+        public static DateTime? ConvertDDMMYYhhmmssToDateTime(string value)
+        {
+            try
+            {
+                return DateTime.ParseExact(value, "dd/MM/yyyy hh:mm:ss", CultureInfo.InvariantCulture);
+            }
+            catch { }
+            return null;
+        }
+        public static TableUploadConfigEntity getConfigValid(string DataType, int IsNull, string MinValue, string MaxValue, int MaxSize, int RequireType, string ListValue, string SchemaNameRelationship
+           , string TableNameRelationship, string ColumnNameRelationship, string ColumnNameGet, string DataTypeGet, string ColumnWhere = "", string ValueWhere = "")
+        {
+            TableUploadConfigEntity detail = new TableUploadConfigEntity();
+            detail.DataType = DataType;
+            detail.IsNull = IsNull;
+            detail.MinValue = MinValue;
+            detail.MaxValue = MaxValue;
+            detail.MaxSize = MaxSize;
+            detail.RequireType = RequireType;
+            detail.ListValue = ListValue;
+            detail.SchemaNameRelationship = SchemaNameRelationship;
+            detail.TableNameRelationship = TableNameRelationship;
+            detail.ColumnNameRelationship = ColumnNameRelationship;
+            detail.ColumnNameGet = ColumnNameGet;
+            detail.DataTypeGet = DataTypeGet;
+            detail.ColumnWhere = ColumnWhere;
+            detail.ValueWhere = ValueWhere;
+            return detail;
+        }
+        public static string ToNormalize(this string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+                return value.Trim().Normalize(NormalizationForm.FormKC);
+            return value;
         }
     }
 }

@@ -120,5 +120,26 @@ namespace BaseNetCoreApi.Helper
                 return GetConfigByName("AppSettings:MONGODB_NAME");
             }
         }
+        public static string SQL_SERVER
+        {
+            get
+            {
+                return GetConfigByName("AppSettings:SQL_SERVER");
+            }
+        }
+        public static string SQL_USER
+        {
+            get
+            {
+                return GetConfigByName("AppSettings:SQL_USER");
+            }
+        }
+        public static string SQL_PASSWORD
+        {
+            get
+            {
+                return GetConfigByName("AppSettings:SQL_PASSWORD");
+            }
+        }
     }
 }

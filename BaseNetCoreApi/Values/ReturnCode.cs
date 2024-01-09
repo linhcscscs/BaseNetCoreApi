@@ -51,6 +51,7 @@ namespace BaseNetCoreApi.Values
                 _errorMsg = value;
             }
         }
+        public object Object { get; set; }
         public int StatusCode() => _eReturnCode?.GetStatusCode() ?? 500;
     }
     public enum EReturnCode

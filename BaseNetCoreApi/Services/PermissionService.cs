@@ -11,7 +11,9 @@ using BaseNetCoreApi.Models.ViewModel;
 using BaseNetCoreApi.Services.Interface;
 using BaseNetCoreApi.Values;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2010.Excel;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using System.Data;
 
 namespace BaseNetCoreApi.Services
@@ -68,7 +70,7 @@ namespace BaseNetCoreApi.Services
                 ret.ErrorMsg = "Không tìm thấy nhóm quyền";
                 return ret;
             }
-            if (groupUser.XaMa != _workContextService.MA_XA || 
+            if (groupUser.XaMa != _workContextService.MA_XA ||
                 groupUser.TinhMa != _workContextService.MA_TINH)
             {
                 ret = new ReturnCode(EReturnCode.Forbidden);
@@ -79,7 +81,216 @@ namespace BaseNetCoreApi.Services
         public List<DSNhomQuyenViewModel> GetDsNhomQuyen(DSNhomQuyenRequest model)
         {
             var lstGrpUser = _groupUserRepository.GetGroupUser(_workContextService.MA_TINH, _workContextService.MA_XA, model.MaNhomQuyen, model.TenNhomQuyen) ?? new List<GroupUser>();
-            return _groupUserRepository.ConvertToDSNhomQuyenViewModel(lstGrpUser) ;
+            return _groupUserRepository.ConvertToDSNhomQuyenViewModel(lstGrpUser);
+        }
+        public ReturnCode AddDsNhomQuyen(List<DSNhomQuyenViewModel> model, out List<DSNhomQuyenViewModel> result)
+        {
+            result = new List<DSNhomQuyenViewModel>();
+            var lstInsert = _groupUserRepository.ConvertToGroupUser(model);
+            var ret = _groupUserRepository.Insert(lstInsert);
+            if (ret.Success)
+            {
+                _unitOfWork.SaveChanges();
+                result = _groupUserRepository.ConvertToDSNhomQuyenViewModel(lstInsert);
+            }
+            return ret;
+        }
+        public string? AddDsNhomQuyenExcelUploadFile(IFormFile file)
+        {
+            string? filePath = null;
+            UltilHelper.SaveTempExcelStaticFile(file, out filePath);
+            return filePath;
+        }
+        public DataTable AddDsNhomQuyenExcelResult(string filePath)
+        {
+            return _qiCache.GetByKey(
+                 () =>
+                 {
+                     DataTable dt = new DataTable();
+                     #region add column
+                     dt.Columns.Add("RowID");
+                     dt.Columns.Add("id");
+                     dt.Columns.Add("GroupUserCode");
+                     dt.Columns.Add("GroupUserName");
+                     dt.Columns.Add("Status");
+                     #endregion
+                     #region Add data
+                     IWorkbook hssfwb = null;
+                     using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                     {
+                         string Ext = System.IO.Path.GetExtension(filePath); //<-get extention
+                         switch (Ext.ToLower())
+                         {
+                             case ".xls":
+                                 hssfwb = new HSSFWorkbook(stream);
+                                 break;
+
+                             case ".xlsx":
+                                 hssfwb = new XSSFWorkbook(stream);
+                                 break;
+                         }
+                     }
+                     string sheetName = "Sheet1";
+                     ISheet sheet = hssfwb.GetSheet(sheetName);
+                     if (sheet == null)
+                     {
+                         return dt;
+                     }
+                     for (int row = 2 - 1; row <= sheet.LastRowNum; row++)
+                     {
+                         if (sheet.GetRow(row) != null) //null is when the row only contains empty cells 
+                         {
+                             DataRow dtrow = dt.NewRow();
+                             dtrow["RowID"] = row + 1;
+                             dtrow["id"] = row + 1;
+                             int i = 0;
+                             var isValid = true;
+                             #region ma
+                             string ma = "";
+                             try
+                             {
+                                 ma = sheet.GetRow(row).GetCell(i).ToString().Trim();
+                                 isValid = isValid && !string.IsNullOrEmpty(ma) &&
+                                 _groupUserRepository.FirstOrDefault(q => q.GroupUserCode == ma) == null;
+                             }
+                             catch { }
+                             i++;
+                             dtrow["GroupUserCode"] = ma;
+                             #endregion
+                             #region ten
+                             string ten = "";
+                             try
+                             {
+                                 ten = sheet.GetRow(row).GetCell(i).ToString().Trim();
+                                 isValid = isValid && !string.IsNullOrEmpty(ten);
+                             }
+                             catch { }
+                             i++;
+                             dtrow["GroupUsername"] = ten;
+                             #endregion
+                             #region trang_thai
+                             string trang_thai = "";
+                             try
+                             {
+                                 trang_thai = sheet.GetRow(row).GetCell(i).ToString().Trim();
+                                 isValid = isValid && int.TryParse(trang_thai, out _);
+                             }
+                             catch { }
+                             i++;
+                             dtrow["Status"] = trang_thai;
+                             #endregion
+                             // Kiểm tra dòng có dữ liệu thì mới thêm vào trong datatable
+                             if (!string.IsNullOrEmpty(ma) || !string.IsNullOrEmpty(ten) || !string.IsNullOrEmpty(trang_thai))
+                                 dt.Rows.Add(dtrow);
+                         }
+                     }
+                     return dt;
+                     #endregion
+                 },
+                 key: _qiCache.BuildCachedKey("getDataExcelByTempUpload", filePath),
+                 cacheTime: 300000
+                 );
+        }
+        public ReturnCode AddDsNhomQuyenExcelSave(DSNhomQuyenImportExcelSave model, out List<ResultEntity> result)
+        {
+            var ret = new ReturnCode();
+            var dt = AddDsNhomQuyenExcelResult(model.FilePath);
+            var lstImport = new List<GroupUser>();
+            var lstOBJ = _groupUserRepository.GetMulti(q => q.XaMa == _workContextService.MA_XA && q.TinhMa == _workContextService.MA_TINH).ToList();
+            result = new List<ResultEntity>();
+            foreach (DataRow row in dt.Rows)
+            {
+                ResultEntity res = new ResultEntity();
+                res.Res = true;
+                res.Msg = "Thành công";
+                res.ResObject = row["RowID"];
+                GroupUser detailEntity = new GroupUser();
+                detailEntity = lstOBJ.FirstOrDefault(x => x.GroupUserCode.ToNormalizeLowerRelace() == row["GroupUserCode"].ToString().ToNormalizeLowerRelace());
+                if (detailEntity != null && detailEntity.GroupUserId > 0 && !model.UpdateIfExists)
+                {
+                    res.ResObject = res.ResObject + "_" + "Mã";
+                    res.Res = false;
+                    res.Msg = "Mã đã tồn tại";
+                    goto Endfor;
+                }
+                if (detailEntity == null) detailEntity = new GroupUser();
+                #region Valid column
+                res.ResObject = row["RowID"].ToString();
+                string Error = "", ErrorDes = "";
+                detailEntity.TinhMa = _workContextService.MA_TINH;
+                detailEntity.XaMa = _workContextService.MA_XA;
+                #region ma
+                object ma = null;
+                var cfgMa = UltilHelper.getConfigValid(SysDataType.String, 1, "", "", 50, 0, "", "", "", "", "", SysDataType.String);
+                res.Res = ValidateHelper.ValidateObject(cfgMa, row["GroupUserCode"].ToString(), out ma, out Error, out ErrorDes);
+                res.Msg = ErrorDes;
+                #region Lỗi thì dừng check dòng của bảng
+                if (!res.Res)
+                {
+                    res.ResObject = res.ResObject + "_" + "Mã";
+                    goto Endfor;
+                }
+                #endregion
+                #region Không lỗi thì lấy giá trị
+                else
+                {
+                    detailEntity.GroupUserCode = ((string)ma).ToNormalize();
+                }
+                #endregion
+                #endregion
+                #region ten
+                object ten = null;
+                var cfgTen = UltilHelper.getConfigValid(SysDataType.String, 1, "", "", 50, 0, "", "", "", "", "", SysDataType.String);
+                res.Res = ValidateHelper.ValidateObject(cfgTen, row["GroupUserName"].ToString(), out ten, out Error, out ErrorDes);
+                res.Msg = ErrorDes;
+                #region Lỗi thì dừng check dòng của bảng
+                if (!res.Res)
+                {
+                    res.ResObject = res.ResObject + "_" + "Tên";
+                    goto Endfor;
+                }
+                #endregion
+                #region Không lỗi thì lấy giá trị
+                else
+                {
+                    detailEntity.GroupUserName = ((string)ten).ToNormalize();
+                }
+                #endregion
+                #endregion
+                #region trang_thai
+                object trang_thai = null;
+                var cfgtrang_thai = UltilHelper.getConfigValid(SysDataType.Int32, 1, "0", "2", 150, 0, "", "", "", "", "", SysDataType.Int32);
+                res.Res = ValidateHelper.ValidateObject(cfgtrang_thai, row["Status"].ToString(), out trang_thai, out Error, out ErrorDes);
+                res.Msg = ErrorDes;
+                #region Lỗi thì dừng check dòng của bảng
+                if (!res.Res)
+                {
+                    res.ResObject = res.ResObject + "_" + "Trạng thái";
+                    goto Endfor;
+                }
+                #endregion
+                #region Không lỗi thì lấy giá trị
+                else
+                {
+                    detailEntity.Status = (int)trang_thai;
+                }
+                #endregion
+                #endregion
+                #endregion
+                if (res.Res) lstImport.Add(detailEntity);
+            Endfor:
+                result.Add(res);
+            }
+            if(!result.Any(a => !a.Res))
+            {
+                _groupUserRepository.InsertOrUpdate(lstImport);
+                _unitOfWork.SaveChanges();
+            }
+            else
+            {
+                ret.ErrorMsg = "Ghi thất bại";
+            }
+            return ret;
         }
         public (string? filePath, string? fileName) GetDsNhomQuyenExcel(DSNhomQuyenRequest model)
         {
@@ -115,9 +326,9 @@ namespace BaseNetCoreApi.Services
                 lstHeader.Add(new ExcelHeaderEntity { name = colText, colM = 1, rowM = 1, width = 22 });
                 lstColumn.Add(new ExcelEntity { Name = colName, Align = XLAlignmentHorizontalValues.Left, Color = XLColor.Black, Type = "String" });
             }
-            
 
-            
+
+
             colName = "IsQuanTri";
             colText = "Là quản trị";
             {
@@ -201,7 +412,7 @@ namespace BaseNetCoreApi.Services
                 var gu = _groupUserRepository.GetById(item.GroupUserId);
                 gu.GroupUserCode = item.Ma;
                 gu.GroupUserName = item.Ten;
-                gu.Isroot = item.IsQuanTri? 1 : 0;
+                gu.Isroot = item.IsQuanTri ? 1 : 0;
                 gu.Status = item.Status;
                 lstInsertOrUpdate.Add(gu);
             }
@@ -255,7 +466,7 @@ namespace BaseNetCoreApi.Services
 
                 var gum = lstGroupUserMenu.FirstOrDefault(q => q.GroupUserId == gume.GroupUserID && q.MenuId == gume.MenuID);
 
-                if(gum == null)
+                if (gum == null)
                 {
                     gum = new GroupUserMenu();
                 }
@@ -296,12 +507,12 @@ namespace BaseNetCoreApi.Services
                    {
                        return new GroupUser();
                    };
-                   return _groupUserRepository.FirstOrDefault(q => q.GroupUserId == nguoiDung.GroupUserId 
+                   return _groupUserRepository.FirstOrDefault(q => q.GroupUserId == nguoiDung.GroupUserId
                    //&& q.Status == TrangThaiValue.HIEU_LUC
                    );
                },
-               key: _qiCache.BuildCachedKey(_nguoiDungRepository.CacheKeyPattern,  
-                                            _groupUserRepository.CacheKeyPattern, 
+               key: _qiCache.BuildCachedKey(_nguoiDungRepository.CacheKeyPattern,
+                                            _groupUserRepository.CacheKeyPattern,
                                             "GetGroupUserByNguoiDung", nguoiDungId),
                cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
                );
@@ -320,8 +531,8 @@ namespace BaseNetCoreApi.Services
                         .Where(q => q.GroupUserId == groupUser.GroupUserId && q.Menu.IsView == 1)
                         .ToList(),
                key: _qiCache.BuildCachedKey(_nguoiDungRepository.CacheKeyPattern,
-                                            _groupUserRepository.CacheKeyPattern, 
-                                            _groupUserMenuRepository.CacheKeyPattern, 
+                                            _groupUserRepository.CacheKeyPattern,
+                                            _groupUserMenuRepository.CacheKeyPattern,
                                             "GetGroupUserMenuByNguoiDung", nguoiDungId),
                cacheTime: CachingTime.CACHING_TIME_DEFAULT_IN_5_MINUTES
                );

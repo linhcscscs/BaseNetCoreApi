@@ -22,7 +22,7 @@ namespace BaseNetCoreApi.Models.ViewModel
         {
             get
             {
-                return string.IsNullOrEmpty(ErrorCode);
+                return string.IsNullOrEmpty(ErrorCode) && string.IsNullOrEmpty(ErrorMessage);
             }
         }
         public string? ErrorCode { get; set; }

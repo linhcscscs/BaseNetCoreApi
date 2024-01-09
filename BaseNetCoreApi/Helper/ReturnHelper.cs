@@ -6,11 +6,12 @@ namespace BaseNetCoreApi.Helper
 {
     public static class ReturnHelper
     {
-        public static IActionResult ReturnFile(this ControllerBase controllerBase, string filePath, string fileName)
+        public static IActionResult ReturnFile(this ControllerBase controllerBase, string filePath, string fileName, bool isDelete = true)
         {
             if (System.IO.File.Exists(filePath))
             {
-                var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose);
+                var fileOption = isDelete ? FileOptions.DeleteOnClose : FileOptions.None;
+                var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 4096, fileOption);
                 return controllerBase.File(
                         fileStream: fs,
                         contentType: System.Net.Mime.MediaTypeNames.Application.Octet,
@@ -31,10 +32,12 @@ namespace BaseNetCoreApi.Helper
                 return ReturnErrorStatusCode(new ReturnCode(EReturnCode.InternalErrorException));
             }
         }
-
-        public static IActionResult ReturnErrorStatusCode(ReturnCode ret)
+        public static IActionResult ReturnErrorStatusCode(ReturnCode ret, object? Data = null)
         {
-            var model = new ResponseModel(ret);
+            var model = new ResponseModel(ret)
+            {
+                Data = Data
+            };
             var result = new ObjectResult(model)
             {
                 StatusCode = ret.StatusCode()

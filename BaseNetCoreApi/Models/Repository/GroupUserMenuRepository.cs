@@ -4,6 +4,7 @@ using BaseNetCoreApi.Infrastructure.Repository;
 using BaseNetCoreApi.Models.PHO_CAP_GDEntities;
 using BaseNetCoreApi.Models.Entities;
 using BaseNetCoreApi.DomainService.Interface;
+using Z.BulkOperations;
 
 namespace BaseNetCoreApi.Models.Repository
 {
@@ -55,11 +56,12 @@ namespace BaseNetCoreApi.Models.Repository
                 cacheTime: 300000
                 );
         }
-        public void InsertOrUpdate( List<GroupUserMenu> entities)
+
+        public override void InsertOrUpdate(List<GroupUserMenu> entities, Action<BulkOperation<GroupUserMenu>>? options = null)
         {
             foreach (var entity in entities)
             {
-                if(entity.GroupUserMenuId <= 0)
+                if (entity.GroupUserMenuId <= 0)
                 {
                     entity.CreateAt = DateTime.Now;
                     entity.CreateBy = _workContextService.NguoiDung.TenDangNhap;
@@ -71,7 +73,7 @@ namespace BaseNetCoreApi.Models.Repository
                 }
             }
 
-            base.InsertOrUpdate( entities , options =>
+            base.InsertOrUpdate(entities, options =>
             {
                 options.BatchSize = 100;
                 options.ColumnPrimaryKeyExpression = entity => new

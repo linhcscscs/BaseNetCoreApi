@@ -52,13 +52,14 @@ namespace BaseNetCoreApi.Services
         public List<MenuAdminViewModel> UpdateMenus(List<MenuUpdateViewModel> models)
         {
             var lstId = models.Select(s => s.MenuId).ToList();
-            var oldMenus = _menuRepository.GetByListId(lstId);
+            var oldMenus = _menuRepository.GetByListId(lstId) ?? new List<Menu>();
             var lstUpdate = new List<Menu>();
             foreach (var oldMenu in oldMenus)
             {
                 var model = models.FirstOrDefault(q => q.MenuId == oldMenu.MenuId)!;
                 var newMenu = new Menu()
                 {
+                    MenuId = oldMenu.MenuId,
                     MenuCode = model.MenuCode,
                     MenuNameEg = model.MenuNameEg,
                     MenuName = model.MenuName,
@@ -87,7 +88,7 @@ namespace BaseNetCoreApi.Services
         public List<MenuAdminViewModel> DeleteMenu(List<MenuDeleteViewModel> model)
         {
             var lstId = model.Select(x => x.MenuId).ToList();
-            var lstDelete = _menuRepository.GetByListId(lstId);
+            var lstDelete = _menuRepository.GetByListId(lstId) ?? new List<Menu>();
             _menuRepository.Remove(lstDelete);
             _unitOfWork.SaveChanges();
             return _mapper.Map<List<MenuAdminViewModel>>(lstDelete);
