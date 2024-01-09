@@ -18,7 +18,6 @@ namespace BaseNetCoreApi.Models.Repository
 {
     public interface IDMPhongGdRepository : IRepository<PhongGd>
     {
-        void InsertOrUpdate(List<PhongGd> phongGds);
         void UpdateIdHuyen(string maSGD = "", string maPGD = "");
         List<PhongGd> GetListPhongByMaSoGD(string maSoGD, int? maNamHoc = null);
     }

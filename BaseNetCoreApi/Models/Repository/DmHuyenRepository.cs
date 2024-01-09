@@ -14,7 +14,6 @@ namespace BaseNetCoreApi.Models.Repository
     public interface IDmHuyenRepository : IRepository<DmHuyen>
     {
         List<DMTinhHuyenDto> GetListByListMaTinh(List<string>? lst_ma_tinh = null, string ten_huyen = "", int? maNamHoc = null);
-        void InsertOrUpdate(List<DmHuyen> lstHuyen);
     }
     public class DmHuyenRepository : Repository<DmHuyen>, IDmHuyenRepository
     {

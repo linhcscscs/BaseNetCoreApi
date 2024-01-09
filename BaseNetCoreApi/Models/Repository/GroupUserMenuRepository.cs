@@ -12,7 +12,6 @@ namespace BaseNetCoreApi.Models.Repository
     {
         GroupUserMenu? GetById(long Id);
         List<GroupUserMenuEntity> getQuyenByGroupUserID(long Id);
-        void InsertOrUpdate(List<GroupUserMenu> entities);
     }
     public class GroupUserMenuRepository : Repository<GroupUserMenu>, IGroupUserMenuRepository
     {

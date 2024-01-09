@@ -19,7 +19,6 @@ namespace BaseNetCoreApi.Models.Repository
     public interface ITruongRepository : IRepository<Truong>
     {
         void UpdateIdHuyen(string maTinh, string maHuyen, string maXa);
-        void InsertOrUpdate(List<Truong> lstTruong);
     }
     public class TruongRepository : Repository<Truong>, ITruongRepository
     {

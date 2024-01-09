@@ -17,8 +17,6 @@ namespace BaseNetCoreApi.Models.Repository
     public interface IDmXaRepository : IRepository<DmXa>
     {
         List<DMPhuongXaDto> GetListByListMaTinhMaHuyen(List<string>? lst_ma_tinh = null, List<string>? lst_ma_huyen = null, string? ten_xa = null, string? ma_xa = null, int? maNamHoc = null);
-        void InsertOrUpdate(DmXa entity);
-        void InsertOrUpdate(List<DmXa> entities);
         void UpdateIdHuyen(string maTinh = "", string maHuyen = "");
     }
     public class DmXaRepository : Repository<DmXa>, IDmXaRepository
@@ -82,10 +80,6 @@ namespace BaseNetCoreApi.Models.Repository
                                             maNamHoc),
             cacheTime: 300000
                 );
-        }
-        public void InsertOrUpdate(DmXa entity)
-        {
-            InsertOrUpdate(new List<DmXa>() { entity });
         }
         public override void InsertOrUpdate(List<DmXa> entities, Action<BulkOperation<DmXa>>? options = null)
         {
